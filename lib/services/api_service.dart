@@ -332,4 +332,35 @@ class ApiService {
       return {'success': false, 'message': 'Lỗi kết nối: $e'};
     }
   }
+
+  // ===== ORDER TRACKING APIs =====
+
+  /// Lấy chi tiết đơn hàng với route stops
+  /// GET: /api/order/tracking?orderId={id}&customerId={customerId}
+  Future<Map<String, dynamic>?> getOrderTracking(
+    int orderId,
+    int customerId,
+  ) async {
+    final url = Uri.parse(
+      '$baseUrl/order/tracking?orderId=$orderId&customerId=$customerId',
+    );
+
+    try {
+      print('🔍 Calling Tracking API: $url'); // DEBUG
+      final response = await http.get(url);
+
+      print('📡 Response status: ${response.statusCode}'); // DEBUG
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print('✅ Tracking data received'); // DEBUG
+        return data;
+      }
+      print('❌ Tracking API returned status: ${response.statusCode}'); // DEBUG
+      return null;
+    } catch (e) {
+      print('💥 Tracking Error: $e'); // DEBUG
+      return null;
+    }
+  }
 }

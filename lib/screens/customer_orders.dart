@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lms_flutter/providers/auth_provider.dart';
+import 'package:lms_flutter/screens/all_orders_screen.dart';
 import 'package:lms_flutter/screens/create_order_screen.dart';
+import 'package:lms_flutter/screens/order_detail_screen.dart';
 import 'package:lms_flutter/services/api_service.dart';
 import 'package:provider/provider.dart';
 
@@ -31,7 +33,7 @@ class _CustomerOrdersScreenState extends State<CustomerOrdersScreen> {
 
       if (mounted) {
         setState(() {
-          _recentOrders = orders.take(5).toList(); // Chỉ lấy 5 đơn gần nhất
+          _recentOrders = orders.take(3).toList(); // Chỉ lấy 3 đơn gần nhất
           _isLoading = false;
         });
       }
@@ -149,7 +151,9 @@ class _CustomerOrdersScreenState extends State<CustomerOrdersScreen> {
             ),
             TextButton(
               onPressed: () {
-                // TODO: Navigate to all orders
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const AllOrdersScreen()),
+                );
               },
               child: const Text('Xem tất cả'),
             ),
@@ -163,88 +167,96 @@ class _CustomerOrdersScreenState extends State<CustomerOrdersScreen> {
   }
 
   Widget _buildOrderList() {
+    final customerId =
+        Provider.of<AuthProvider>(context, listen: false).user?.customerId ?? 0;
+
     return Column(
       children: _recentOrders.map((order) {
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey[300]!),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              // Mã đơn
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        return GestureDetector(
+          onTap: () {
+            final orderId = order['Id'];
+            if (orderId != null) {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => OrderDetailScreen(
+                    orderId: orderId,
+                    customerId: customerId,
+                  ),
+                ),
+              );
+            }
+          },
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey[300]!),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Row 1: Mã đơn + Arrow
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Mã đơn',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                    ),
-                    const SizedBox(height: 4),
                     Text(
                       order['OrderNo'] ?? 'N/A',
                       style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
+                    Icon(
+                      Icons.chevron_right,
+                      color: Colors.grey[400],
+                      size: 20,
                     ),
                   ],
                 ),
-              ),
-              // Trạng thái
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                const SizedBox(height: 8),
+                // Row 2: Trạng thái + Ngày tạo
+                Row(
                   children: [
-                    Text(
-                      'Trạng thái',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      _getStatusText(order['Status']),
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: _getStatusTextColor(order['Status']),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _getStatusTextColor(
+                          order['Status'],
+                        ).withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        _getStatusText(order['Status']),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: _getStatusTextColor(order['Status']),
+                        ),
                       ),
                     ),
-                  ],
-                ),
-              ),
-              // Ngày tạo
-              Expanded(
-                flex: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      'Ngày tạo',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                    ),
-                    const SizedBox(height: 4),
+                    const Spacer(),
+                    Icon(Icons.schedule, size: 14, color: Colors.grey[500]),
+                    const SizedBox(width: 4),
                     Text(
                       _formatDate(order['CreatedAt']),
-                      style: const TextStyle(fontSize: 13),
-                      textAlign: TextAlign.right,
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                   ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       }).toList(),
@@ -262,11 +274,11 @@ class _CustomerOrdersScreenState extends State<CustomerOrdersScreen> {
       case 'Approved':
         return 'Đã duyệt';
       case '2':
-      case 'Completed':
-        return 'Hoàn tất';
-      case '3':
       case 'InTransit':
         return 'Đang giao';
+      case '3':
+      case 'Completed':
+        return 'Hoàn tất';
       case '4':
       case 'Cancelled':
         return 'Đã hủy';
@@ -285,11 +297,11 @@ class _CustomerOrdersScreenState extends State<CustomerOrdersScreen> {
       case 'Approved':
         return Colors.blue;
       case '2':
+      case 'InTransit':
+        return Colors.purple;
+      case '3':
       case 'Completed':
         return Colors.green;
-      case '3':
-      case 'InTransit':
-        return Colors.blue;
       case '4':
       case 'Cancelled':
         return Colors.red;
