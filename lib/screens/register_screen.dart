@@ -55,13 +55,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
-          title: const Text('Đăng Ký'),
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
+          title: const Text(
+            'Đăng Ký Tài Khoản',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.blue,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
         body: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
             child: Column(
@@ -69,30 +79,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
               children: [
                 // Role Selection
                 const Text(
-                  'Loại Tài Khoản',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  'Chọn loại tài khoản',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     Expanded(
                       child: _buildRoleCard(
                         role: 'customer',
-                        icon: Icons.person,
+                        icon: Icons.person_rounded,
                         label: 'Khách Hàng',
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: _buildRoleCard(
                         role: 'driver',
-                        icon: Icons.local_shipping,
+                        icon: Icons.local_shipping_rounded,
                         label: 'Tài Xế',
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
 
                 // Show form only after role selection
                 if (_selectedRole != null) ...[
@@ -100,29 +114,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Center(
                     child: Column(
                       children: [
-                        GestureDetector(
-                          onTap: _pickImage,
-                          child: CircleAvatar(
-                            radius: 60,
-                            backgroundColor: Colors.grey[200],
-                            backgroundImage: _avatarImage != null
-                                ? FileImage(_avatarImage!)
-                                : const AssetImage(
-                                        'assets/images/default_avatar 2.png',
-                                      )
-                                      as ImageProvider,
-                          ),
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.blue.shade50,
+                          backgroundImage: _avatarImage != null
+                              ? FileImage(_avatarImage!)
+                              : null,
+                          child: _avatarImage == null
+                              ? Icon(
+                                  Icons.person,
+                                  size: 50,
+                                  color: Colors.blue.shade200,
+                                )
+                              : null,
                         ),
-                        const SizedBox(height: 8),
-                        TextButton.icon(
+                        const SizedBox(height: 12),
+                        TextButton(
                           onPressed: _pickImage,
-                          icon: const Icon(Icons.photo_camera),
-                          label: const Text('Chọn ảnh đại diện'),
+                          child: const Text(
+                            "Nhấn vào đây để tải ảnh đại diện",
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
 
                   // Common Fields
                   _buildTextField(
@@ -150,8 +170,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     icon: Icons.lock_outline,
                     obscureText: true,
                     validator: (value) {
-                      if (value?.isEmpty ?? true)
+                      if (value?.isEmpty ?? true) {
                         return 'Vui lòng nhập mật khẩu';
+                      }
                       if (value!.length < 6)
                         return 'Mật khẩu phải có ít nhất 6 ký tự';
                       return null;
@@ -165,10 +186,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     icon: Icons.lock_outline,
                     obscureText: true,
                     validator: (value) {
-                      if (value?.isEmpty ?? true)
+                      if (value?.isEmpty ?? true) {
                         return 'Vui lòng nhập lại mật khẩu';
-                      if (value != _passwordController.text)
+                      }
+                      if (value != _passwordController.text) {
                         return 'Mật khẩu không khớp';
+                      }
                       return null;
                     },
                   ),
@@ -202,8 +225,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       icon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
-                        if (value?.isEmpty ?? true)
+                        if (value?.isEmpty ?? true) {
                           return 'Vui lòng nhập email';
+                        }
                         if (!value!.contains('@')) return 'Email không hợp lệ';
                         return null;
                       },
@@ -223,32 +247,48 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     const SizedBox(height: 16),
                     // GPLX Dropdown
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 0),
-                      child: DropdownButtonFormField<String>(
-                        value: _selectedLicenseType,
-                        decoration: InputDecoration(
-                          labelText: 'Giấy Phép Lái Xe (GPLX)',
-                          prefixIcon: const Icon(Icons.badge_outlined),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
+                    DropdownButtonFormField<String>(
+                      value: _selectedLicenseType,
+                      decoration: InputDecoration(
+                        labelText: 'Giấy Phép Lái Xe',
+                        prefixIcon: const Icon(
+                          Icons.badge_outlined,
+                          color: Colors.blue,
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Colors.blue.shade100,
+                            width: 1,
                           ),
                         ),
-                        items: _licenseTypes.map((String type) {
-                          return DropdownMenuItem<String>(
-                            value: type,
-                            child: Text(type),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            _selectedLicenseType = newValue;
-                          });
-                        },
-                        validator: (value) => value == null
-                            ? 'Vui lòng chọn loại bằng lái'
-                            : null,
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Colors.blue,
+                            width: 2,
+                          ),
+                        ),
                       ),
+                      items: _licenseTypes.map((String type) {
+                        return DropdownMenuItem<String>(
+                          value: type,
+                          child: Text(type),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedLicenseType = newValue;
+                        });
+                      },
+                      validator: (value) =>
+                          value == null ? 'Vui lòng chọn loại bằng lái' : null,
                     ),
                     const SizedBox(height: 16),
                     _buildTextField(
@@ -261,19 +301,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ],
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 40),
 
                   // Register Button
                   SizedBox(
                     width: double.infinity,
-                    height: 50,
+                    height: 56,
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _register,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         foregroundColor: Colors.white,
+                        elevation: 2,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
                       child: _isLoading
@@ -286,26 +327,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                             )
                           : const Text(
-                              'Đăng Ký',
+                              'ĐĂNG KÝ',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                 ],
 
                 // Login Link (always visible)
                 Center(
-                  child: Row(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('Đã có tài khoản? '),
+                      const Text(
+                        'Đã có tài khoản? ',
+                        style: TextStyle(color: Colors.grey),
+                      ),
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Đăng nhập'),
+                        child: const Text(
+                          'Đăng nhập ngay',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -327,29 +377,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return GestureDetector(
       onTap: () => setState(() => _selectedRole = role),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.blue : Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? Colors.blue : Colors.grey[300]!,
+            color: isSelected ? Colors.blue : Colors.grey.shade300,
             width: 2,
           ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: Colors.blue.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : [],
         ),
         child: Column(
           children: [
-            Icon(
-              icon,
-              size: 40,
-              color: isSelected ? Colors.white : Colors.grey[600],
-            ),
+            Icon(icon, size: 40, color: isSelected ? Colors.blue : Colors.grey),
             const SizedBox(height: 8),
             Text(
               label,
               style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: isSelected ? Colors.white : Colors.grey[800],
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: isSelected ? Colors.blue : Colors.grey.shade800,
               ),
             ),
           ],
@@ -374,8 +429,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
       maxLines: maxLines,
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        prefixIcon: Icon(icon, color: Colors.blue),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.blue.shade100, width: 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.blue, width: 2),
+        ),
       ),
       validator: validator,
     );

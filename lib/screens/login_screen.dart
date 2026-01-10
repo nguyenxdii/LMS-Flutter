@@ -82,6 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
+        backgroundColor: Colors.white,
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
@@ -91,29 +92,46 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 60),
 
-                  // // Logo hoặc Title
-                  // const Icon(
-                  //   Icons.local_shipping_outlined,
-                  //   size: 80,
-                  //   color: Colors.blue,
-                  // ),
-                  // const SizedBox(height: 20),
                   const Text(
                     "LOGISTICS APP",
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                      letterSpacing: 1.2,
+                    ),
                   ),
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 48),
 
                   // Username field
                   TextFormField(
                     controller: _usernameController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: "Tên đăng nhập",
-                      prefixIcon: Icon(Icons.person),
-                      border: OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.person, color: Colors.blue),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Colors.blue.shade100,
+                          width: 1,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Colors.blue,
+                          width: 2,
+                        ),
+                      ),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -131,12 +149,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     obscureText: !_showPassword,
                     decoration: InputDecoration(
                       labelText: "Mật khẩu",
-                      prefixIcon: const Icon(Icons.lock),
+                      prefixIcon: const Icon(Icons.lock, color: Colors.blue),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _showPassword
                               ? Icons.visibility
                               : Icons.visibility_off,
+                          color: Colors.blue,
                         ),
                         onPressed: () {
                           setState(() {
@@ -144,7 +163,26 @@ class _LoginScreenState extends State<LoginScreen> {
                           });
                         },
                       ),
-                      border: const OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Colors.blue.shade100,
+                          width: 1,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Colors.blue,
+                          width: 2,
+                        ),
+                      ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -154,7 +192,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     onFieldSubmitted: (_) => _handleLogin(),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 40),
 
                   // Login button
                   isLoading
@@ -162,26 +200,41 @@ class _LoginScreenState extends State<LoginScreen> {
                       : ElevatedButton(
                           onPressed: _handleLogin,
                           style: ElevatedButton.styleFrom(
-                            minimumSize: const Size(double.infinity, 50),
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            elevation: 2,
+                            minimumSize: const Size(double.infinity, 56),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(16),
                             ),
                           ),
                           child: const Text(
                             "ĐĂNG NHẬP",
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
 
                   // Register link
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text("Bạn chưa có tài khoản?"),
+                      const Text(
+                        "Bạn chưa có tài khoản?",
+                        style: TextStyle(color: Colors.grey),
+                      ),
                       TextButton(
                         onPressed: _goRegister,
-                        child: const Text("Đăng ký ngay!"),
+                        child: const Text(
+                          "Đăng ký ngay",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                          ),
+                        ),
                       ),
                     ],
                   ),

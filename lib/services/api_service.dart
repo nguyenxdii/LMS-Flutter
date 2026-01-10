@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/user_model.dart';
+import '../models/driver_shipment_model.dart';
 
 class ApiService {
   // URL cơ sở của API
@@ -361,6 +362,99 @@ class ApiService {
     } catch (e) {
       print('💥 Tracking Error: $e'); // DEBUG
       return null;
+    }
+  }
+
+  // ===== DRIVER SHIPMENT APIs =====
+
+  Future<DriverDashboardStats?> getDriverDashboardStats(int driverId) async {
+    final url = Uri.parse('$baseUrl/driver/dashboard-stats?driverId=$driverId');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        return DriverDashboardStats.fromJson(jsonDecode(response.body));
+      }
+      return null;
+    } catch (e) {
+      print('Error getting dashboard stats: $e');
+      return null;
+    }
+  }
+
+  Future<List<ShipmentRow>> getDriverShipments(int driverId) async {
+    final url = Uri.parse('$baseUrl/driver/shipments?driverId=$driverId');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map((e) => ShipmentRow.fromJson(e)).toList();
+      }
+      return [];
+    } catch (e) {
+      print('Error getting shipments: $e');
+      return [];
+    }
+  }
+
+  Future<List<ShipmentRow>> getDriverHistory(int driverId) async {
+    final url = Uri.parse('$baseUrl/driver/history?driverId=$driverId');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map((e) => ShipmentRow.fromJson(e)).toList();
+      }
+      return [];
+    } catch (e) {
+      print('Error getting history: $e');
+      return [];
+    }
+  }
+
+  Future<ShipmentDetail?> getShipmentDetail(
+    int shipmentId,
+    int driverId,
+  ) async {
+    final url = Uri.parse(
+      '$baseUrl/driver/shipment-detail?shipmentId=$shipmentId&driverId=$driverId',
+    );
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        return ShipmentDetail.fromJson(jsonDecode(response.body));
+      }
+      return null;
+    } catch (e) {
+      print('Error getting shipment detail: $e');
+      return null;
+    }
+  }
+
+  Future<bool> updateShipmentStatus({
+    required int shipmentId,
+    required int driverId,
+    required String action,
+    String? note,
+  }) async {
+    final url = Uri.parse('$baseUrl/driver/update-status');
+    try {
+      final body = {
+        'ShipmentId': shipmentId,
+        'DriverId': driverId,
+        'Action': action,
+        if (note != null) 'Note': note,
+      };
+
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
+
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Error updating status: $e');
+      return false;
     }
   }
 }

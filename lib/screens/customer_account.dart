@@ -63,20 +63,26 @@ class _CustomerAccountScreenState extends State<CustomerAccountScreen>
           children: [
             _AvatarSection(
               user: user,
-              onAvatarTap: () => _pickAndUploadAvatar(user?.customerId ?? 0),
+              isEditing: _isEditingProfile,
+              onAvatarTap: () {
+                if (_isEditingProfile) {
+                  _pickAndUploadAvatar(user?.customerId ?? 0);
+                }
+              },
             ),
             const SizedBox(height: 25),
 
             _ProfileCard(
               user: user,
               isEditing: _isEditingProfile,
+              isEnabled: !_isEditingPassword,
               isLoading: _isLoading,
               nameController: _nameController,
               phoneController: _phoneController,
               emailController: _emailController,
               addressController: _addressController,
               onEdit: () => _startEditingProfile(user),
-              onCancel: () => setState(() => _isEditingProfile = false),
+              onCancel: () => _handleCancelProfile(user),
               onSave: _saveProfile,
             ),
             const SizedBox(height: 15),
@@ -84,6 +90,7 @@ class _CustomerAccountScreenState extends State<CustomerAccountScreen>
             _PasswordCard(
               user: user,
               isEditing: _isEditingPassword,
+              isEnabled: !_isEditingProfile,
               isLoading: _isLoading,
               oldPasswordController: _oldPasswordController,
               newPasswordController: _newPasswordController,
@@ -95,7 +102,7 @@ class _CustomerAccountScreenState extends State<CustomerAccountScreen>
               onToggleNewPassword: (val) =>
                   setState(() => _showNewPassword = val),
               onEdit: () => _startEditingPassword(),
-              onCancel: () => setState(() => _isEditingPassword = false),
+              onCancel: _handleCancelPassword,
               onSave: _savePassword,
             ),
             const SizedBox(height: 25),
@@ -108,6 +115,7 @@ class _CustomerAccountScreenState extends State<CustomerAccountScreen>
   }
 
   void _startEditingProfile(dynamic user) {
+    if (_isEditingPassword) return;
     setState(() {
       _isEditingProfile = true;
       _nameController.text = user?.fullName ?? "";
@@ -118,8 +126,67 @@ class _CustomerAccountScreenState extends State<CustomerAccountScreen>
   }
 
   void _startEditingPassword() {
+    if (_isEditingProfile) return;
     setState(() {
       _isEditingPassword = true;
+      _oldPasswordController.clear();
+      _newPasswordController.clear();
+      _confirmPasswordController.clear();
+    });
+  }
+
+  Future<bool> _showDiscardDialog() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Hủy thay đổi?"),
+        content: const Text(
+          "Bạn có thay đổi chưa lưu. Bạn có chắc chắn muốn hủy không?",
+        ),
+        actions: [
+          OutlinedButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text("Không"),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text("Có, hủy", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
+  void _handleCancelProfile(dynamic user) async {
+    final hasChanges =
+        _nameController.text != (user?.fullName ?? "") ||
+        _phoneController.text != (user?.phone ?? "") ||
+        _emailController.text != (user?.email ?? "") ||
+        _addressController.text != (user?.address ?? "");
+
+    if (hasChanges) {
+      final confirm = await _showDiscardDialog();
+      if (!confirm) return;
+    }
+
+    setState(() => _isEditingProfile = false);
+  }
+
+  void _handleCancelPassword() async {
+    final hasInput =
+        _oldPasswordController.text.isNotEmpty ||
+        _newPasswordController.text.isNotEmpty ||
+        _confirmPasswordController.text.isNotEmpty;
+
+    if (hasInput) {
+      final confirm = await _showDiscardDialog();
+      if (!confirm) return;
+    }
+
+    setState(() {
+      _isEditingPassword = false;
       _oldPasswordController.clear();
       _newPasswordController.clear();
       _confirmPasswordController.clear();
@@ -325,9 +392,14 @@ class _CustomerAccountScreenState extends State<CustomerAccountScreen>
 // ===== AVATAR SECTION WIDGET =====
 class _AvatarSection extends StatelessWidget {
   final dynamic user;
+  final bool isEditing;
   final VoidCallback onAvatarTap;
 
-  const _AvatarSection({required this.user, required this.onAvatarTap});
+  const _AvatarSection({
+    required this.user,
+    required this.isEditing,
+    required this.onAvatarTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -354,19 +426,24 @@ class _AvatarSection extends StatelessWidget {
           child: Stack(
             children: [
               avatarWidget,
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
+              if (isEditing)
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: const Icon(
+                      Icons.edit,
+                      size: 16,
+                      color: Colors.white,
+                    ),
                   ),
-                  child: const Icon(Icons.edit, size: 16, color: Colors.white),
                 ),
-              ),
             ],
           ),
         ),
@@ -396,6 +473,7 @@ class _AvatarSection extends StatelessWidget {
 class _ProfileCard extends StatelessWidget {
   final dynamic user;
   final bool isEditing;
+  final bool isEnabled;
   final bool isLoading;
   final TextEditingController nameController;
   final TextEditingController phoneController;
@@ -408,6 +486,7 @@ class _ProfileCard extends StatelessWidget {
   const _ProfileCard({
     required this.user,
     required this.isEditing,
+    this.isEnabled = true,
     required this.isLoading,
     required this.nameController,
     required this.phoneController,
@@ -453,8 +532,12 @@ class _ProfileCard extends StatelessWidget {
         ),
         if (!isEditing)
           IconButton(
-            icon: const Icon(Icons.edit, size: 20, color: Colors.blue),
-            onPressed: onEdit,
+            icon: Icon(
+              Icons.edit,
+              size: 20,
+              color: isEnabled ? Colors.blue : Colors.grey,
+            ),
+            onPressed: isEnabled ? onEdit : null,
           ),
       ],
     );
@@ -546,6 +629,7 @@ class _ProfileCard extends StatelessWidget {
 class _PasswordCard extends StatelessWidget {
   final dynamic user;
   final bool isEditing;
+  final bool isEnabled;
   final bool isLoading;
   final TextEditingController oldPasswordController;
   final TextEditingController newPasswordController;
@@ -561,6 +645,7 @@ class _PasswordCard extends StatelessWidget {
   const _PasswordCard({
     required this.user,
     required this.isEditing,
+    this.isEnabled = true,
     required this.isLoading,
     required this.oldPasswordController,
     required this.newPasswordController,
@@ -614,8 +699,12 @@ class _PasswordCard extends StatelessWidget {
         ),
         if (!isEditing)
           IconButton(
-            icon: const Icon(Icons.edit, size: 20, color: Colors.blue),
-            onPressed: onEdit,
+            icon: Icon(
+              Icons.edit,
+              size: 20,
+              color: isEnabled ? Colors.blue : Colors.grey,
+            ),
+            onPressed: isEnabled ? onEdit : null,
           ),
       ],
     );
