@@ -34,7 +34,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         centerTitle: true,
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: false, // không thêm nút back trên appBar
       ),
       body: IndexedStack(index: _selectedIndex, children: _pages),
       bottomNavigationBar: Container(

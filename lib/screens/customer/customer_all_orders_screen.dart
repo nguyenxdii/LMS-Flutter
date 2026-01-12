@@ -57,7 +57,7 @@ class _CustomerAllOrdersScreenState extends State<CustomerAllOrdersScreen> {
               child: _orders.isEmpty
                   ? _buildEmptyState()
                   : ListView.builder(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(15),
                       itemCount: _orders.length,
                       itemBuilder: (context, index) =>
                           _buildOrderCard(_orders[index]),
@@ -83,8 +83,8 @@ class _CustomerAllOrdersScreenState extends State<CustomerAllOrdersScreen> {
         }
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 15),
+        padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
@@ -111,7 +111,11 @@ class _CustomerAllOrdersScreenState extends State<CustomerAllOrdersScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Icon(Icons.chevron_right, color: Colors.grey[400], size: 20),
+                Icon(
+                  Icons.chevron_right,
+                  color: Colors.grey.shade400,
+                  size: 20,
+                ),
               ],
             ),
             const SizedBox(height: 8),
@@ -133,17 +137,17 @@ class _CustomerAllOrdersScreenState extends State<CustomerAllOrdersScreen> {
                     _getStatusText(order['Status']),
                     style: TextStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700, // độ mỏng của text
                       color: _getStatusColor(order['Status']),
                     ),
                   ),
                 ),
-                const Spacer(),
-                Icon(Icons.schedule, size: 14, color: Colors.grey[500]),
+                const Spacer(), // chiếm toàn bộ chiều rộng còn lại
+                Icon(Icons.schedule, size: 14, color: Colors.grey.shade500),
                 const SizedBox(width: 4),
                 Text(
                   _formatDate(order['CreatedAt']),
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                 ),
               ],
             ),
@@ -203,7 +207,10 @@ class _CustomerAllOrdersScreenState extends State<CustomerAllOrdersScreen> {
     if (dateStr == null) return 'N/A';
     try {
       final date = DateTime.parse(dateStr.toString());
-      return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+      return '${date.day.toString().padLeft(2, '0')}/'
+          '${date.month.toString().padLeft(2, '0')}/'
+          '${date.year} ${date.hour.toString().padLeft(2, '0')}'
+          ':${date.minute.toString().padLeft(2, '0')}';
     } catch (e) {
       return dateStr.toString();
     }

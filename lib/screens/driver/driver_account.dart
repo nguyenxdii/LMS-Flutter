@@ -209,6 +209,14 @@ class _DriverAccountScreenState extends State<DriverAccountScreen>
       _showMessage("Vui lòng nhập họ tên");
       return;
     }
+    if (_phoneController.text.trim().isEmpty) {
+      _showMessage("Vui lòng nhập số điện thoại");
+      return;
+    }
+    if (_phoneController.text.trim().length != 10) {
+      _showMessage("Số điện thoại phải có 10 số");
+      return;
+    }
 
     // Validate CCCD - phải 12 số
     final cccd = _cccdController.text.trim();
@@ -752,7 +760,7 @@ class _PasswordCard extends StatelessWidget {
     return _InfoRow(
       icon: Icons.lock,
       label: "Mật khẩu",
-      value: "••••••",
+      value: "•••••••••",
       color: Colors.blue,
     );
   }
@@ -781,7 +789,9 @@ class _PasswordCard extends StatelessWidget {
           showPassword: showNewPassword,
           color: Colors.blue,
         ),
+
         const SizedBox(height: 12),
+
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -884,7 +894,7 @@ class _EditField extends StatelessWidget {
               keyboardType: keyboardType,
               decoration: InputDecoration(
                 labelText: label,
-                isDense: true,
+                isDense: true, // thu gọn textfield
                 contentPadding: const EdgeInsets.symmetric(
                   vertical: 8,
                   horizontal: 0,
@@ -922,7 +932,7 @@ class _CccdField extends StatelessWidget {
               ],
               decoration: InputDecoration(
                 labelText: "CCCD (12 số)",
-                isDense: true,
+                isDense: true, // thu gọn textfield
                 contentPadding: const EdgeInsets.symmetric(
                   vertical: 8,
                   horizontal: 0,
@@ -961,10 +971,10 @@ class _LicenseDropdown extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: DropdownButtonFormField<String>(
-              value: selectedValue,
+              initialValue: selectedValue,
               decoration: InputDecoration(
                 labelText: "Bằng lái",
-                isDense: true,
+                isDense: true, // thu gọn textfield
                 contentPadding: const EdgeInsets.symmetric(
                   vertical: 8,
                   horizontal: 0,
@@ -1011,7 +1021,7 @@ class _PasswordField extends StatelessWidget {
               obscureText: !showPassword,
               decoration: InputDecoration(
                 labelText: label,
-                isDense: true,
+                isDense: true, // thu gọn textfield
                 contentPadding: const EdgeInsets.symmetric(
                   vertical: 8,
                   horizontal: 0,

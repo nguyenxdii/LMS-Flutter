@@ -319,7 +319,10 @@ class _CustomerOrdersScreenState extends State<CustomerOrdersScreen> {
     if (dateStr == null) return 'N/A';
     try {
       final date = DateTime.parse(dateStr.toString());
-      return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+      return '${date.day.toString().padLeft(2, '0')}/'
+          '${date.month.toString().padLeft(2, '0')}/'
+          '${date.year} ${date.hour.toString().padLeft(2, '0')}'
+          ':${date.minute.toString().padLeft(2, '0')}';
     } catch (e) {
       return dateStr.toString();
     }

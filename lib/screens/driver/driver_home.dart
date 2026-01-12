@@ -60,7 +60,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
         centerTitle: true,
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: false, // không hiển thị back button
       ),
       body: IndexedStack(index: _selectedIndex, children: _pages),
       bottomNavigationBar: Container(
@@ -79,7 +79,7 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
               label: 'Tài khoản',
             ),
           ],
-          currentIndex: _selectedIndex,
+          currentIndex: _selectedIndex, // tab hiện tại
           selectedItemColor: Colors.blue,
           unselectedItemColor: Colors.grey,
           onTap: _onItemTapped,

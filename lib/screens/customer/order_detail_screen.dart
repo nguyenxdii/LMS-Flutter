@@ -22,7 +22,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   bool _isLoading = true;
   String? _errorMessage;
 
-  final _currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
+  final _currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
   final _dateFormat = DateFormat('dd/MM/yyyy HH:mm');
 
   @override
@@ -125,7 +125,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -156,7 +156,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 ),
               ],
             ),
+
             const SizedBox(height: 8),
+
             Row(
               children: [
                 Icon(Icons.payments, size: 18, color: Colors.grey[600]),
@@ -310,10 +312,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           )
         else
           ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true, // co vừa đủ cho nội dung
+            physics: const NeverScrollableScrollPhysics(), // không cho scroll
             itemCount: stops.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            separatorBuilder: (_, _) => const SizedBox(height: 8),
             itemBuilder: (context, index) => _buildRouteStopCard(stops[index]),
           ),
       ],
@@ -344,7 +346,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 Container(
                   width: 32,
                   height: 32,
-                  alignment: Alignment.center,
+                  alignment: Alignment.center, // căn content giữa container
                   decoration: BoxDecoration(
                     color: _getStopStatusColor(stop.status),
                     borderRadius: BorderRadius.circular(8),
@@ -423,11 +425,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Color _getStopStatusColor(int status) {
     switch (status) {
       case 0:
-        return Colors.grey; // đang chờ
+        return Colors.grey; // đang chờ status == 0
       case 1:
-        return Colors.blue; // đã đến
+        return Colors.blue; // đã đến status == 1
       case 2:
-        return Colors.green; // đã rời đi
+        return Colors.green; // đã rời đi status == 2
       default:
         return Colors.grey;
     }
@@ -504,7 +506,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 ),
               ],
             ),
+
             const SizedBox(height: 4),
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

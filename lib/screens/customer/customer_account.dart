@@ -202,6 +202,26 @@ class _CustomerAccountScreenState extends State<CustomerAccountScreen>
       _showMessage("Vui lòng nhập họ tên");
       return;
     }
+    if (_phoneController.text.trim().isEmpty) {
+      _showMessage("Vui lòng nhập số điện thoại");
+      return;
+    }
+    if (_phoneController.text.trim().length != 10) {
+      _showMessage("Số điện thoại phải có 10 số");
+      return;
+    }
+    if (_emailController.text.trim().isEmpty) {
+      _showMessage("Vui lòng nhập email");
+      return;
+    }
+    if (!_emailController.text.trim().contains('@')) {
+      _showMessage("Email không hợp lệ");
+      return;
+    }
+    if (_addressController.text.trim().isEmpty) {
+      _showMessage("Vui lòng nhập địa chỉ");
+      return;
+    }
 
     setState(() => _isLoading = true);
 
@@ -290,6 +310,7 @@ class _CustomerAccountScreenState extends State<CustomerAccountScreen>
   }
 
   Future<void> _pickAndUploadAvatar(int customerId) async {
+    // hiện thông báo trên snackbar
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
@@ -391,12 +412,13 @@ class _CustomerAccountScreenState extends State<CustomerAccountScreen>
   }
 }
 
-// ===== AVATAR SECTION WIDGET =====
+// widget phần avatar
 class _AvatarSection extends StatelessWidget {
   final dynamic user;
   final bool isEditing;
   final VoidCallback onAvatarTap;
 
+  // constructor
   const _AvatarSection({
     required this.user,
     required this.isEditing,
@@ -483,7 +505,7 @@ class _AvatarSection extends StatelessWidget {
   }
 }
 
-// ===== PROFILE CARD WIDGET =====
+// widget thẻ thông tin cá nhân
 class _ProfileCard extends StatelessWidget {
   final dynamic user;
   final bool isEditing;
@@ -497,6 +519,7 @@ class _ProfileCard extends StatelessWidget {
   final VoidCallback onCancel;
   final VoidCallback onSave;
 
+  // constructor
   const _ProfileCard({
     required this.user,
     required this.isEditing,
@@ -541,7 +564,7 @@ class _ProfileCard extends StatelessWidget {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.bold,
-            color: Colors.grey[700],
+            color: Colors.grey.shade700,
           ),
         ),
         if (!isEditing)
@@ -609,7 +632,9 @@ class _ProfileCard extends StatelessWidget {
           label: "Địa chỉ",
           controller: addressController,
         ),
+
         const SizedBox(height: 12),
+
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -626,7 +651,7 @@ class _ProfileCard extends StatelessWidget {
                       width: 16,
                       height: 16,
                       child: CircularProgressIndicator(
-                        strokeWidth: 2,
+                        strokeWidth: 2, // độ dày đường viền
                         color: Colors.white,
                       ),
                     )
@@ -639,7 +664,7 @@ class _ProfileCard extends StatelessWidget {
   }
 }
 
-// ===== PASSWORD CARD WIDGET =====
+// widget thẻ mật khẩu
 class _PasswordCard extends StatelessWidget {
   final dynamic user;
   final bool isEditing;
@@ -725,7 +750,11 @@ class _PasswordCard extends StatelessWidget {
   }
 
   Widget _buildViewMode() {
-    return const _InfoRow(icon: Icons.lock, label: "Mật khẩu", value: "••••••");
+    return const _InfoRow(
+      icon: Icons.lock,
+      label: "Mật khẩu",
+      value: "•••••••••••",
+    );
   }
 
   Widget _buildEditMode() {
@@ -749,7 +778,9 @@ class _PasswordCard extends StatelessWidget {
           controller: confirmPasswordController,
           showPassword: showNewPassword,
         ),
+
         const SizedBox(height: 12),
+
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -782,7 +813,7 @@ class _PasswordCard extends StatelessWidget {
   }
 }
 
-// ===== HELPER WIDGETS =====
+// các widget hỗ trợ
 class _InfoRow extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -889,7 +920,7 @@ class _PasswordField extends StatelessWidget {
               obscureText: !showPassword,
               decoration: InputDecoration(
                 labelText: label,
-                isDense: true,
+                isDense: true, // thu gọn textfield
                 contentPadding: const EdgeInsets.symmetric(
                   vertical: 8,
                   horizontal: 0,

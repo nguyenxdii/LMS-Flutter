@@ -1,4 +1,3 @@
-// Màn hình tạo đơn hàng mới
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/warehouse_model.dart';
@@ -17,32 +16,32 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
   final _formKey = GlobalKey<FormState>();
   final ApiService _apiService = ApiService();
 
-  // Trạng thái loading
+  // trạng thái loading
   bool _isLoadingWarehouses = true;
   bool _isSubmitting = false;
 
-  // Danh sách kho hàng
+  // danh sách kho hàng
   List<Warehouse> _allWarehouses = [];
 
-  // Lựa chọn khu vực
+  // lựa chọn khu vực
   ZoneId? _selectedSendZone;
   ZoneId? _selectedReceiveZone;
 
-  // Lựa chọn kho
+  // lựa chọn kho
   Warehouse? _selectedSendWarehouse;
   Warehouse? _selectedReceiveWarehouse;
 
-  // Danh sách kho theo khu vực
+  // danh sách kho theo khu vực
   List<Warehouse> _sendWarehouses = [];
   List<Warehouse> _receiveWarehouses = [];
 
-  // Các trường form khác
+  // các trường form khác
   bool _needPickup = false;
   final _pickupAddressController = TextEditingController();
   final _packageDescController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
 
-  // Phí vận chuyển
+  // phí vận chuyển
   double _routeFee = 0;
   double _pickupFee = 0;
   double _totalFee = 0;
@@ -60,7 +59,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     super.dispose();
   }
 
-  // Tải kho từ API
+  // tải kho từ api
   Future<void> _loadWarehouses() async {
     setState(() => _isLoadingWarehouses = true);
 
@@ -74,7 +73,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     setState(() => _isLoadingWarehouses = false);
   }
 
-  // Xử lý thay đổi khu vực gửi
+  // xử lý thay đổi khu vực gửi
   void _onSendZoneChanged(ZoneId? zone) {
     setState(() {
       _selectedSendZone = zone;
@@ -84,7 +83,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     });
   }
 
-  // Xử lý thay đổi khu vực nhận
+  // xử lý thay đổi khu vực nhận
   void _onReceiveZoneChanged(ZoneId? zone) {
     setState(() {
       _selectedReceiveZone = zone;
@@ -94,7 +93,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     });
   }
 
-  // Xử lý chọn kho gửi
+  // xử lý chọn kho gửi
   void _onSendWarehouseChanged(Warehouse? warehouse) {
     setState(() {
       _selectedSendWarehouse = warehouse;
@@ -103,7 +102,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     });
   }
 
-  // Xử lý chọn kho nhận
+  // xử lý chọn kho nhận
   void _onReceiveWarehouseChanged(Warehouse? warehouse) {
     setState(() {
       _selectedReceiveWarehouse = warehouse;
@@ -111,7 +110,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     });
   }
 
-  // Cập nhật danh sách kho theo khu vực
+  // cập nhật danh sách kho theo khu vực
   void _updateWarehouseLists() {
     if (_selectedSendZone != null) {
       _sendWarehouses = _allWarehouses
@@ -135,7 +134,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     }
   }
 
-  // Xử lý checkbox lấy hàng tận nơi
+  // xử lý checkbox lấy hàng tận nơi
   void _onNeedPickupChanged(bool? value) {
     setState(() {
       _needPickup = value ?? false;
@@ -146,7 +145,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     });
   }
 
-  // Tính phí vận chuyển
+  // tính phí vận chuyển
   void _calculateFees() {
     if (_selectedSendZone != null && _selectedReceiveZone != null) {
       final distance = (_selectedSendZone!.index - _selectedReceiveZone!.index)
@@ -160,7 +159,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     _totalFee = _routeFee + _pickupFee;
   }
 
-  // Chọn ngày gửi hàng
+  // chọn ngày gửi hàng
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -174,7 +173,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     }
   }
 
-  // Reset form
+  // reset form
   void _resetForm() {
     _formKey.currentState?.reset();
     setState(() {
@@ -198,7 +197,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     ).showSnackBar(const SnackBar(content: Text('Đã tải lại form')));
   }
 
-  // Gửi đơn hàng
+  // gửi đơn hàng
   Future<void> _submitOrder() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -237,7 +236,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
 
     _calculateFees();
 
-    // Hiện dialog xác nhận
+    // hiện dialog xác nhận
     final confirmed = await _showConfirmationDialog();
     if (confirmed != true) return;
 
@@ -297,7 +296,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     }
   }
 
-  // Dialog xác nhận đơn hàng
+  // dialog xác nhận đơn hàng
   Future<bool?> _showConfirmationDialog() {
     return showDialog<bool>(
       context: context,
@@ -368,7 +367,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
 
               const SizedBox(height: 12),
 
-              // Thông tin thanh toán cọc
+              // thông tin thanh toán cọc
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
@@ -463,7 +462,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     );
   }
 
-  // Row trong dialog xác nhận
+  // row trong dialog xác nhận
   Widget _buildConfirmRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -485,7 +484,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     );
   }
 
-  // Format tiền tệ
+  // format tiền tệ
   String _formatCurrency(double amount) {
     final formatted = amount
         .toStringAsFixed(0)
@@ -509,11 +508,11 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
             : Form(
                 key: _formKey,
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(15),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Phần A: Thông tin gửi hàng
+                      // phần a: thông tin gửi hàng
                       _buildSectionHeader('Thông tin gửi hàng', Icons.send),
                       const SizedBox(height: 12),
 
@@ -537,7 +536,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                       ),
                       const SizedBox(height: 20),
 
-                      // Phần B: Thông tin nhận hàng
+                      // phần b: thông tin nhận hàng
                       _buildSectionHeader(
                         'Thông tin nhận hàng',
                         Icons.inventory_2,
@@ -569,14 +568,14 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                       ),
                       const SizedBox(height: 20),
 
-                      // Phần C: Dịch vụ bổ sung
+                      // phần c: dịch vụ bổ sung
                       _buildSectionHeader(
                         'Dịch vụ bổ sung',
                         Icons.local_shipping,
                       ),
                       const SizedBox(height: 12),
 
-                      // Checkbox lấy hàng tận nơi
+                      // checkbox lấy hàng tận nơi
                       Container(
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey.shade300),
@@ -615,13 +614,12 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                         ),
                       ),
 
-                      // Input địa chỉ lấy hàng
+                      // input địa chỉ lấy hàng
                       if (_needPickup) ...[
                         const SizedBox(height: 12),
                         _buildLabel('Địa chỉ lấy hàng'),
                         TextFormField(
                           controller: _pickupAddressController,
-                          maxLines: 2,
                           decoration: InputDecoration(
                             hintText: 'Nhập địa chỉ lấy hàng...',
                             border: OutlineInputBorder(
@@ -638,7 +636,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                       ],
                       const SizedBox(height: 12),
 
-                      // Mô tả hàng hóa
+                      // mô tả hàng hóa
                       _buildLabel('Mô tả hàng hóa'),
                       TextFormField(
                         controller: _packageDescController,
@@ -652,7 +650,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                       ),
                       const SizedBox(height: 12),
 
-                      // Ngày gửi hàng
+                      // ngày gửi hàng
                       _buildLabel('Ngày gửi hàng'),
                       InkWell(
                         onTap: _pickDate,
@@ -665,15 +663,17 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                           ),
                           // format ngày gửi hàng dd/mm/yyyy
                           child: Text(
-                            '${_selectedDate.day.toString().padLeft(2, '0')}/${_selectedDate.month.toString().padLeft(2, '0')}/${_selectedDate.year}',
+                            '${_selectedDate.day.toString().padLeft(2, '0')}/'
+                            '${_selectedDate.month.toString().padLeft(2, '0')}/'
+                            '${_selectedDate.year}',
                           ),
                         ),
                       ),
                       const SizedBox(height: 24),
 
-                      // Phần D: Tổng kết phí
+                      // phần d: tổng kết phí
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(15),
                         decoration: BoxDecoration(
                           // nền gradient chuyển màu
                           gradient: LinearGradient(
@@ -690,7 +690,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                             _buildFeeRow('Phí vận chuyển (Tuyến):', _routeFee),
                             const SizedBox(height: 8),
                             _buildFeeRow('Phí lấy hàng:', _pickupFee),
-                            const Divider(height: 20),
+                            const Divider(height: 20), // đường kẻ
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -716,7 +716,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Nút tải lại
+                      // nút tải lại
                       SizedBox(
                         width: double.infinity,
                         child: OutlinedButton.icon(
@@ -733,7 +733,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                       ),
                       const SizedBox(height: 12),
 
-                      // Nút xác nhận
+                      // nút xác nhận
                       SizedBox(
                         width: double.infinity,
                         height: 50,
@@ -774,7 +774,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     );
   }
 
-  // Header cho mỗi section
+  // header cho mỗi section
   Widget _buildSectionHeader(String title, IconData icon) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
@@ -799,7 +799,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     );
   }
 
-  // Label cho input
+  // label cho input
   Widget _buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -810,7 +810,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     );
   }
 
-  // Dropdown chọn khu vực
+  // dropdown chọn khu vực
   Widget _buildZoneDropdown({
     required ZoneId? value,
     required void Function(ZoneId?)? onChanged,
@@ -818,7 +818,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     bool enabled = true,
   }) {
     return DropdownButtonFormField<ZoneId>(
-      value: value,
+      initialValue: value,
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         contentPadding: const EdgeInsets.symmetric(
@@ -838,7 +838,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     );
   }
 
-  // Dropdown chọn kho
+  // dropdown chọn kho
   Widget _buildWarehouseDropdown({
     required Warehouse? value,
     required List<Warehouse> warehouses,
@@ -847,7 +847,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     required bool enabled,
   }) {
     return DropdownButtonFormField<Warehouse>(
-      value: value,
+      initialValue: value,
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
         contentPadding: const EdgeInsets.symmetric(
@@ -867,7 +867,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     );
   }
 
-  // Row hiển thị phí
+  // row hiển thị phí
   Widget _buildFeeRow(String label, double amount) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

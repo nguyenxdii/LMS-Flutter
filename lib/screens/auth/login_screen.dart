@@ -120,10 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        // backgroundColor: Colors.white,
         backgroundColor: const Color.fromARGB(255, 242, 249, 255),
-
-        // không bị che
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(25.0),
@@ -208,7 +205,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             elevation: 5,
                             minimumSize: const Size(double.infinity, 55),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(15),
                             ),
                           ),
                           child: const Text(

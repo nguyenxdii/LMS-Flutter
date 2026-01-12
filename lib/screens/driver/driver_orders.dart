@@ -14,6 +14,7 @@ class DriverOrdersScreen extends StatefulWidget {
 
 class DriverOrdersScreenState extends State<DriverOrdersScreen>
     with SingleTickerProviderStateMixin {
+  // SingleTickerProviderStateMixin cần cho tabcontroller
   late TabController _tabController;
   final ApiService _apiService = ApiService();
 
@@ -82,9 +83,9 @@ class DriverOrdersScreenState extends State<DriverOrdersScreen>
               : TabBarView(
                   controller: _tabController,
                   children: [
-                    _buildShipmentList(_getNewShipments()),
-                    _buildShipmentList(_getInProgressShipments()),
-                    _buildShipmentList(_historyShipments),
+                    _buildShipmentList(_getNewShipments()), // tab 0
+                    _buildShipmentList(_getInProgressShipments()), // tab 1
+                    _buildShipmentList(_historyShipments), // tab 2
                   ],
                 ),
         ),
@@ -149,6 +150,7 @@ class DriverOrdersScreenState extends State<DriverOrdersScreen>
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      // hiệu ứng khi click
       child: InkWell(
         onTap: () {
           Navigator.push(
@@ -162,6 +164,7 @@ class DriverOrdersScreenState extends State<DriverOrdersScreen>
         borderRadius: BorderRadius.circular(8),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
+          // thông tin chuyến hàng
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -175,6 +178,7 @@ class DriverOrdersScreenState extends State<DriverOrdersScreen>
                       fontSize: 16,
                     ),
                   ),
+                  // badge status
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
@@ -197,6 +201,7 @@ class DriverOrdersScreenState extends State<DriverOrdersScreen>
               ),
               const SizedBox(height: 8),
               Row(
+                // thông tin đường đi
                 children: [
                   const Icon(Icons.map, size: 16, color: Colors.grey),
                   const SizedBox(width: 8),
@@ -211,6 +216,7 @@ class DriverOrdersScreenState extends State<DriverOrdersScreen>
                 ],
               ),
               const SizedBox(height: 4),
+              // thông tin khách hàng
               Row(
                 children: [
                   const Icon(Icons.person, size: 16, color: Colors.grey),
@@ -223,7 +229,10 @@ class DriverOrdersScreenState extends State<DriverOrdersScreen>
                   ),
                 ],
               ),
+
               const Divider(height: 24),
+
+              // thông tin đơn hàng
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

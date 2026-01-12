@@ -175,11 +175,12 @@ class DriverDashboardScreenState extends State<DriverDashboardScreen> {
     final s = _currentShipment!;
     return Card(
       elevation: 4,
-      shadowColor: Colors.blue.withAlpha(26),
+      shadowColor: Colors.blue.withAlpha(26), // màu bóng
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: Colors.blue.shade200, width: 1.5),
       ),
+      // click vào card có hiệu ứng
       child: InkWell(
         onTap: () {
           Navigator.push(
@@ -188,7 +189,7 @@ class DriverDashboardScreenState extends State<DriverDashboardScreen> {
               builder: (context) =>
                   DriverShipmentDetailScreen(shipmentId: s.id),
             ),
-          ).then((_) => _loadData());
+          ).then((_) => _loadData()); // load lại dữ liệu khi quay lại
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
@@ -231,6 +232,7 @@ class DriverDashboardScreenState extends State<DriverDashboardScreen> {
                       ],
                     ),
                   ),
+                  // badge trạng thái
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
@@ -251,7 +253,9 @@ class DriverDashboardScreenState extends State<DriverDashboardScreen> {
                   ),
                 ],
               ),
+
               const Divider(height: 24),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -286,16 +290,16 @@ class DriverDashboardScreenState extends State<DriverDashboardScreen> {
         width: double.infinity,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.grey[100],
+          color: Colors.grey.shade100,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           children: [
-            Icon(Icons.commute, size: 48, color: Colors.grey[400]),
+            Icon(Icons.commute, size: 48, color: Colors.grey.shade400),
             const SizedBox(height: 12),
             Text(
               'Chưa có chuyến đang chạy',
-              style: TextStyle(color: Colors.grey[600]),
+              style: TextStyle(color: Colors.grey.shade600),
             ),
             const SizedBox(height: 12),
             // gọi callback hoặc push trực tiếp màn hình
