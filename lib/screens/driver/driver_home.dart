@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lms_flutter/screens/driver_account.dart';
-import 'package:lms_flutter/screens/driver_dashboard_screen.dart';
-import 'package:lms_flutter/screens/driver_orders.dart';
+import 'package:lms_flutter/screens/driver/driver_account.dart';
+import 'package:lms_flutter/screens/driver/driver_dashboard_screen.dart';
+import 'package:lms_flutter/screens/driver/driver_orders.dart';
 
 class DriverHomeScreen extends StatefulWidget {
   const DriverHomeScreen({super.key});
@@ -13,6 +13,10 @@ class DriverHomeScreen extends StatefulWidget {
 class _DriverHomeScreenState extends State<DriverHomeScreen> {
   int _selectedIndex = 0;
 
+  // globalKeys để gọi refresh từ parent
+  final GlobalKey<DriverDashboardScreenState> _dashboardKey = GlobalKey();
+  final GlobalKey<DriverOrdersScreenState> _ordersKey = GlobalKey();
+
   late List<Widget> _pages;
 
   @override
@@ -20,13 +24,16 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
     super.initState();
     _pages = [
       DriverDashboardScreen(
+        key: _dashboardKey,
         onNavigateToTab: (index) {
           if (index == 1) {
             setState(() => _selectedIndex = 1);
+            // refresh danh sách chuyến khi navigate từ dashboard
+            _ordersKey.currentState?.refresh();
           }
         },
       ),
-      const DriverOrdersScreen(),
+      DriverOrdersScreen(key: _ordersKey),
       const DriverAccountScreen(),
     ];
   }
@@ -36,11 +43,18 @@ class _DriverHomeScreenState extends State<DriverHomeScreen> {
     setState(() {
       _selectedIndex = index;
     });
+    // auto-refresh khi chuyển tab
+    if (index == 0) {
+      _dashboardKey.currentState?.refresh();
+    } else if (index == 1) {
+      _ordersKey.currentState?.refresh();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 242, 249, 255),
       appBar: AppBar(
         title: Text(_getTitle(_selectedIndex)),
         centerTitle: true,

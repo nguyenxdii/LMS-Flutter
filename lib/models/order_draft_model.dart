@@ -1,5 +1,5 @@
-/// OrderDraft model for creating new orders
-/// Matches backend LMS.BUS.Dtos.OrderDraft
+// OrderDraft model for creating new orders
+// Matches backend LMS.BUS.Dtos.OrderDraft
 
 class OrderDraft {
   final int customerId;

@@ -14,12 +14,15 @@ class AuthProvider with ChangeNotifier {
   Future<bool> login(String username, String password) async {
     _setLoading(true);
 
+    // Test loading login
+    // await Future.delayed(const Duration(seconds: 5));
+
     try {
       final user = await _apiService.login(username, password);
 
       if (user != null) {
-        print('✅ Login successful - CCCD: ${user.cccd}'); // DEBUG
-        print('✅ LicenseType: ${user.licenseType}'); // DEBUG
+        print('Login successful - CCCD: ${user.cccd}'); // DEBUG
+        print('LicenseType: ${user.licenseType}'); // DEBUG
 
         _user = user;
         _setLoading(false);
@@ -29,7 +32,7 @@ class AuthProvider with ChangeNotifier {
       _setLoading(false);
       return false;
     } catch (e) {
-      print('❌ Login error: $e'); // DEBUG
+      print('Login error: $e'); // DEBUG
       _setLoading(false);
       return false;
     }

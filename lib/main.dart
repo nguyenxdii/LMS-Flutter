@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:lms_flutter/providers/auth_provider.dart';
-import 'package:lms_flutter/screens/login_screen.dart';
-import 'package:lms_flutter/screens/customer_home.dart';
-import 'package:lms_flutter/screens/driver_home.dart';
-import 'package:lms_flutter/screens/register_screen.dart';
+import 'package:lms_flutter/screens/auth/login_screen.dart';
+import 'package:lms_flutter/screens/customer/customer_home.dart';
+import 'package:lms_flutter/screens/driver/driver_home.dart';
+import 'package:lms_flutter/screens/auth/register_screen.dart';
 import 'package:provider/provider.dart';
 
 void main() {

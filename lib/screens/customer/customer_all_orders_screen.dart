@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:lms_flutter/providers/auth_provider.dart';
-import 'package:lms_flutter/screens/order_detail_screen.dart';
+import 'package:lms_flutter/screens/customer/order_detail_screen.dart';
 import 'package:lms_flutter/services/api_service.dart';
 import 'package:provider/provider.dart';
 
-class AllOrdersScreen extends StatefulWidget {
-  const AllOrdersScreen({super.key});
+class CustomerAllOrdersScreen extends StatefulWidget {
+  const CustomerAllOrdersScreen({super.key});
 
   @override
-  State<AllOrdersScreen> createState() => _AllOrdersScreenState();
+  State<CustomerAllOrdersScreen> createState() =>
+      _CustomerAllOrdersScreenState();
 }
 
-class _AllOrdersScreenState extends State<AllOrdersScreen> {
+class _CustomerAllOrdersScreenState extends State<CustomerAllOrdersScreen> {
   List<Map<String, dynamic>> _orders = [];
   bool _isLoading = true;
 
@@ -43,6 +44,7 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 242, 249, 255),
       appBar: AppBar(
         title: const Text('Tất Cả Đơn Hàng'),
         backgroundColor: Colors.blue,
@@ -89,7 +91,7 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
           border: Border.all(color: Colors.grey[300]!),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -98,7 +100,7 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Row 1: Mã đơn + Arrow
+            // hàng 1: mã đơn + arrow
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -113,7 +115,7 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
               ],
             ),
             const SizedBox(height: 8),
-            // Row 2: Trạng thái + Ngày tạo
+            // hàng 2: trạng thái + ngày tạo
             Row(
               children: [
                 Container(
@@ -122,7 +124,9 @@ class _AllOrdersScreenState extends State<AllOrdersScreen> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: _getStatusColor(order['Status']).withOpacity(0.15),
+                    color: _getStatusColor(
+                      order['Status'],
+                    ).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(

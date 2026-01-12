@@ -1,5 +1,5 @@
-/// Models for Order Tracking feature
-/// Maps to backend Order, Shipment, and RouteStop entities
+// Models for Order Tracking feature
+// Maps to backend Order, Shipment, and RouteStop entities
 
 class OrderTracking {
   final int id;

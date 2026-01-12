@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lms_flutter/services/api_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -13,29 +15,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _picker = ImagePicker();
 
-  // Role selection
-  String?
-  _selectedRole; // null initially, 'customer' or 'driver' after selection
+  // Lựa chọn vai trò
+  String? _selectedRole; // null ban đầu, 'customer' hoặc 'driver' sau khi chọn
 
-  // Common fields
+  // Các trường dùng chung
   final _fullNameController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _phoneController = TextEditingController();
 
-  // Customer fields
+  // Các trường riêng của khách hàng
   final _emailController = TextEditingController();
   final _addressController = TextEditingController();
 
-  // Driver fields
+  // Các trường riêng của tài xế
   final _cccdController = TextEditingController();
-  String? _selectedLicenseType; // Dropdown selection
+  String? _selectedLicenseType; // Dropdown chọn loại bằng lái
   final List<String> _licenseTypes = ['B2', 'C', 'D', 'E', 'FC', 'FD', 'FE'];
 
-  // Avatar
+  // avatar
   File? _avatarImage;
   bool _isLoading = false;
+
+  // nút hiện/ẩn mật khẩu
+  bool _showPassword = false;
+  bool _showConfirmPassword = false;
 
   @override
   void dispose() {
@@ -55,29 +60,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 242, 249, 255),
         appBar: AppBar(
           title: const Text(
             'Đăng Ký Tài Khoản',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           centerTitle: true,
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.blue,
-          elevation: 0,
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+          elevation: 1,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+            icon: const Icon(Icons.arrow_back, size: 20),
             onPressed: () => Navigator.pop(context),
           ),
         ),
         body: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(25),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Role Selection
+                // Lựa chọn vai trò
                 const Text(
                   'Chọn loại tài khoản',
                   style: TextStyle(
@@ -86,7 +91,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     color: Colors.blue,
                   ),
                 ),
+
                 const SizedBox(height: 16),
+
                 Row(
                   children: [
                     Expanded(
@@ -100,22 +107,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Expanded(
                       child: _buildRoleCard(
                         role: 'driver',
-                        icon: Icons.local_shipping_rounded,
+                        icon: Icons.drive_eta_rounded,
                         label: 'Tài Xế',
                       ),
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 32),
 
-                // Show form only after role selection
+                // Hiển thị form sau khi chọn role
                 if (_selectedRole != null) ...[
-                  // Avatar Section
+                  // Phần ảnh đại diện
                   Center(
                     child: Column(
                       children: [
                         CircleAvatar(
-                          radius: 50,
+                          radius: 60,
                           backgroundColor: Colors.blue.shade50,
                           backgroundImage: _avatarImage != null
                               ? FileImage(_avatarImage!)
@@ -128,11 +136,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 )
                               : null,
                         ),
+
                         const SizedBox(height: 12),
+
                         TextButton(
                           onPressed: _pickImage,
                           child: const Text(
-                            "Nhấn vào đây để tải ảnh đại diện",
+                            "Nhấn vào đây để chọn ảnh đại diện",
                             style: TextStyle(
                               color: Colors.blue,
                               fontWeight: FontWeight.bold,
@@ -142,9 +152,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 32),
 
-                  // Common Fields
+                  const SizedBox(height: 30),
+
+                  // Các trường dùng chung
                   _buildTextField(
                     controller: _fullNameController,
                     label: 'Họ và Tên',
@@ -152,7 +163,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     validator: (value) =>
                         value?.isEmpty ?? true ? 'Vui lòng nhập họ tên' : null,
                   ),
-                  const SizedBox(height: 16),
+
+                  const SizedBox(height: 15),
 
                   _buildTextField(
                     controller: _usernameController,
@@ -162,29 +174,145 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ? 'Vui lòng nhập tên tài khoản'
                         : null,
                   ),
-                  const SizedBox(height: 16),
 
-                  _buildTextField(
+                  const SizedBox(height: 15),
+
+                  TextFormField(
                     controller: _passwordController,
-                    label: 'Mật Khẩu',
-                    icon: Icons.lock_outline,
-                    obscureText: true,
+                    obscureText: !_showPassword,
+                    decoration: InputDecoration(
+                      labelText: 'Mật Khẩu',
+                      prefixIcon: const Icon(
+                        Icons.lock_outline,
+                        color: Colors.blue,
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _showPassword
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                          color: Colors.blue,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _showPassword = !_showPassword;
+                          });
+                        },
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      // border khi không focus
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Colors.blue.shade100,
+                          width: 1,
+                        ),
+                      ),
+                      // border khi focus
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Colors.blue,
+                          width: 2,
+                        ),
+                      ),
+                      // border khi có lỗi
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Colors.blue.shade100,
+                          width: 1,
+                        ),
+                      ),
+                      // border khi có lỗi và focus
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Colors.blue,
+                          width: 2,
+                        ),
+                      ),
+                    ),
                     validator: (value) {
                       if (value?.isEmpty ?? true) {
                         return 'Vui lòng nhập mật khẩu';
                       }
-                      if (value!.length < 6)
+                      if (value!.length < 6) {
                         return 'Mật khẩu phải có ít nhất 6 ký tự';
+                      }
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
 
-                  _buildTextField(
+                  const SizedBox(height: 15),
+
+                  // Nhập lại mật khẩu với nút hiện/ẩn
+                  TextFormField(
                     controller: _confirmPasswordController,
-                    label: 'Nhập Lại Mật Khẩu',
-                    icon: Icons.lock_outline,
-                    obscureText: true,
+                    obscureText: !_showConfirmPassword,
+                    decoration: InputDecoration(
+                      labelText: 'Nhập Lại Mật Khẩu',
+                      prefixIcon: const Icon(
+                        Icons.lock_outline,
+                        color: Colors.blue,
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _showConfirmPassword
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                          color: Colors.blue,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _showConfirmPassword = !_showConfirmPassword;
+                          });
+                        },
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      // border khi không focus
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Colors.blue.shade100,
+                          width: 1,
+                        ),
+                      ),
+                      // border khi focus
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Colors.blue,
+                          width: 2,
+                        ),
+                      ),
+                      // border khi có lỗi
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Colors.blue.shade100,
+                          width: 1,
+                        ),
+                      ),
+                      // border khi có lỗi và focus
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Colors.blue,
+                          width: 2,
+                        ),
+                      ),
+                    ),
                     validator: (value) {
                       if (value?.isEmpty ?? true) {
                         return 'Vui lòng nhập lại mật khẩu';
@@ -195,20 +323,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
 
-                  // Customer-specific fields
+                  const SizedBox(height: 15),
+
+                  // Các trường riêng của khách hàng
                   if (_selectedRole == 'customer') ...[
                     _buildTextField(
                       controller: _addressController,
                       label: 'Địa Chỉ',
                       icon: Icons.location_on_outlined,
-                      maxLines: 3,
                       validator: (value) => value?.isEmpty ?? true
                           ? 'Vui lòng nhập địa chỉ'
                           : null,
                     ),
-                    const SizedBox(height: 16),
+
+                    const SizedBox(height: 15),
+
                     _buildTextField(
                       controller: _phoneController,
                       label: 'Số Điện Thoại',
@@ -218,7 +348,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ? 'Vui lòng nhập số điện thoại'
                           : null,
                     ),
-                    const SizedBox(height: 16),
+
+                    const SizedBox(height: 15),
+
                     _buildTextField(
                       controller: _emailController,
                       label: 'Email',
@@ -234,7 +366,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ],
 
-                  // Driver-specific fields
+                  // Các trường dành cho tài xế
                   if (_selectedRole == 'driver') ...[
                     _buildTextField(
                       controller: _phoneController,
@@ -245,10 +377,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ? 'Vui lòng nhập số điện thoại'
                           : null,
                     ),
-                    const SizedBox(height: 16),
-                    // GPLX Dropdown
+
+                    const SizedBox(height: 15),
+
+                    // Dropdown chọn loại GPLX
                     DropdownButtonFormField<String>(
-                      value: _selectedLicenseType,
+                      initialValue: _selectedLicenseType,
                       decoration: InputDecoration(
                         labelText: 'Giấy Phép Lái Xe',
                         prefixIcon: const Icon(
@@ -261,6 +395,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide.none,
                         ),
+                        // border khi không focus
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(
@@ -268,7 +403,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             width: 1,
                           ),
                         ),
+                        // border khi focus
                         focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Colors.blue,
+                            width: 2,
+                          ),
+                        ),
+                        // border khi có lỗi
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Colors.blue.shade100,
+                            width: 1,
+                          ),
+                        ),
+                        // border khi có lỗi và focus
+                        focusedErrorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(
                             color: Colors.blue,
@@ -290,7 +442,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       validator: (value) =>
                           value == null ? 'Vui lòng chọn loại bằng lái' : null,
                     ),
-                    const SizedBox(height: 16),
+
+                    const SizedBox(height: 15),
+
                     _buildTextField(
                       controller: _cccdController,
                       label: 'CCCD',
@@ -301,12 +455,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ],
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 30),
 
-                  // Register Button
+                  // Nút đăng ký
                   SizedBox(
                     width: double.infinity,
-                    height: 56,
+                    height: 55,
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _register,
                       style: ElevatedButton.styleFrom(
@@ -331,6 +485,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
+                                letterSpacing: 5,
                               ),
                             ),
                     ),
@@ -338,7 +493,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 24),
                 ],
 
-                // Login Link (always visible)
+                // Liên kết đăng nhập
                 Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -377,28 +532,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return GestureDetector(
       onTap: () => setState(() => _selectedRole = role),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(15),
           border: Border.all(
             color: isSelected ? Colors.blue : Colors.grey.shade300,
             width: 2,
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: Colors.blue.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : [],
         ),
         child: Column(
           children: [
             Icon(icon, size: 40, color: isSelected ? Colors.blue : Colors.grey),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             Text(
               label,
               style: TextStyle(
@@ -444,6 +590,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Colors.blue, width: 2),
         ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.blue.shade100, width: 1),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.blue, width: 2),
+        ),
       ),
       validator: validator,
     );
@@ -464,31 +618,83 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
+  // Xử lý đăng ký tài khoản
   Future<void> _register() async {
+    // Validate form trước
     if (_formKey.currentState?.validate() != true) {
       return;
     }
 
     setState(() => _isLoading = true);
 
-    // TODO: Implement registration logic
-    await Future.delayed(const Duration(seconds: 2));
+    final apiService = ApiService();
+    Map<String, dynamic> result;
 
-    if (!mounted) return;
-    setState(() => _isLoading = false);
+    try {
+      // Chuyển avatar sang Base64 nếu có
+      String? avatarBase64;
+      if (_avatarImage != null) {
+        final bytes = await _avatarImage!.readAsBytes();
+        avatarBase64 = base64Encode(bytes);
+      }
 
-    // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Đăng ký thành công! (Demo)'),
-        backgroundColor: Colors.green,
-      ),
-    );
+      // Gọi API tương ứng với role đã chọn
+      if (_selectedRole == 'customer') {
+        result = await apiService.registerCustomer(
+          fullName: _fullNameController.text.trim(),
+          username: _usernameController.text.trim(),
+          password: _passwordController.text,
+          address: _addressController.text.trim(),
+          phone: _phoneController.text.trim(),
+          email: _emailController.text.trim(),
+          avatarBase64: avatarBase64,
+        );
+      } else {
+        result = await apiService.registerDriver(
+          fullName: _fullNameController.text.trim(),
+          username: _usernameController.text.trim(),
+          password: _passwordController.text,
+          phone: _phoneController.text.trim(),
+          licenseType: _selectedLicenseType ?? '',
+          citizenId: _cccdController.text.trim(),
+          avatarBase64: avatarBase64,
+        );
+      }
 
-    // Navigate back to login
-    await Future.delayed(const Duration(seconds: 1));
-    if (mounted) {
-      Navigator.of(context).pop();
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+
+      // Xử lý kết quả từ API
+      if (result['success'] == true) {
+        // Đăng ký thành công
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message'] ?? 'Đăng ký thành công!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Chờ 1 giây rồi quay về màn Login
+        await Future.delayed(const Duration(seconds: 1));
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+      } else {
+        // Đăng ký thất bại - hiển thị lỗi
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message'] ?? 'Đăng ký thất bại'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi: $e'), backgroundColor: Colors.red),
+      );
     }
   }
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/driver_shipment_model.dart';
-import '../providers/auth_provider.dart';
-import '../services/api_service.dart';
+import '../../models/driver_shipment_model.dart';
+import '../../providers/auth_provider.dart';
+import '../../services/api_service.dart';
 
 import 'driver_shipment_detail_screen.dart';
 
@@ -12,14 +12,17 @@ class DriverDashboardScreen extends StatefulWidget {
   const DriverDashboardScreen({super.key, required this.onNavigateToTab});
 
   @override
-  State<DriverDashboardScreen> createState() => _DriverDashboardScreenState();
+  DriverDashboardScreenState createState() => DriverDashboardScreenState();
 }
 
-class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
+class DriverDashboardScreenState extends State<DriverDashboardScreen> {
   final ApiService _apiService = ApiService();
   bool _isLoading = true;
   DriverDashboardStats? _stats;
   ShipmentRow? _currentShipment;
+
+  // phương thức công khai để refresh từ parent
+  void refresh() => _loadData();
 
   @override
   void initState() {
@@ -37,12 +40,12 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // 1. Get Stats
+      // 1. lấy thống kê
       final stats = await _apiService.getDriverDashboardStats(driverId);
 
-      // 2. Get Shipments to find "Current" (In Progress)
+      // 2. lấy danh sách chuyến để tìm chuyến "đang chạy"
       final shipments = await _apiService.getDriverShipments(driverId);
-      // Priority: OnRoute > AtWarehouse > ArrivedDestination > Assigned
+      // Ưu tiên: OnRoute > AtWarehouse > ArrivedDestination > Assigned
       final current = shipments.firstWhere(
         (s) =>
             ['OnRoute', 'AtWarehouse', 'ArrivedDestination'].contains(s.status),
@@ -56,7 +59,7 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
           customerName: '',
           originWarehouse: '',
           destinationWarehouse: '',
-        ), // Placeholder
+        ), // placeholder
       );
 
       setState(() {
@@ -135,7 +138,7 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
 
   Widget _buildStatCard(String title, int count, Color color, IconData icon) {
     return SizedBox(
-      height: 110, // Fixed height to prevent overflow
+      height: 110, // chiều cao cố định để tránh tràn
       child: Card(
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -295,7 +298,7 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
               style: TextStyle(color: Colors.grey[600]),
             ),
             const SizedBox(height: 12),
-            // Call generic callback or push screen directly
+            // gọi callback hoặc push trực tiếp màn hình
             ElevatedButton(
               onPressed: () => widget.onNavigateToTab(1),
               child: const Text('Xem danh sách chuyến'),

@@ -55,6 +55,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 242, 249, 255),
       appBar: AppBar(
         title: const Text('Chi Tiết Đơn Hàng'),
         backgroundColor: Colors.blue,
@@ -98,17 +99,17 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // SECTION 1: Header - Order Info
+            // tiêu đề - thông tin đơn hàng
             _buildOrderHeader(),
             const SizedBox(height: 20),
 
-            // SECTION 2: Route Stops (if has shipment)
+            // các điểm dừng lộ trình (nếu có chuyến hàng)
             if (_order!.shipment != null) ...[
               _buildRouteStopsSection(),
               const SizedBox(height: 20),
             ],
 
-            // SECTION 3: Shipping Info
+            // thông tin vận chuyển
             _buildShippingInfoSection(),
           ],
         ),
@@ -116,7 +117,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
-  // ========== SECTION 1: ORDER HEADER ==========
+  // tiêu đề đơn hàng
   Widget _buildOrderHeader() {
     final order = _order!;
 
@@ -128,7 +129,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Order No + Status
+            // mã đơn hàng + trạng thái
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -144,7 +145,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             ),
             const SizedBox(height: 12),
 
-            // Date & Total
+            // ngày tạo & tổng tiền
             Row(
               children: [
                 Icon(Icons.schedule, size: 18, color: Colors.grey[600]),
@@ -171,7 +172,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               ],
             ),
 
-            // Shipment info if exists
+            // thông tin chuyến hàng nếu có
             if (order.shipment != null) ...[
               const Divider(height: 24),
               Row(
@@ -194,7 +195,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               ),
             ],
 
-            // Cancel reason if cancelled
+            // lý do hủy nếu đơn bị hủy
             if (order.status == 4 && order.cancelReason != null) ...[
               const Divider(height: 24),
               Container(
@@ -242,23 +243,23 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     Color textColor;
 
     switch (status) {
-      case 0: // Pending
+      case 0: // chờ xử lý
         bgColor = Colors.orange[100]!;
         textColor = Colors.orange[800]!;
         break;
-      case 1: // Approved
+      case 1: // đã duyệt
         bgColor = Colors.blue[100]!;
         textColor = Colors.blue[800]!;
         break;
-      case 2: // InTransit (if used)
+      case 2: // đang vận chuyển
         bgColor = Colors.purple[100]!;
         textColor = Colors.purple[800]!;
         break;
-      case 3: // Completed
+      case 3: // hoàn thành
         bgColor = Colors.green[100]!;
         textColor = Colors.green[800]!;
         break;
-      case 4: // Cancelled
+      case 4: // đã hủy
         bgColor = Colors.red[100]!;
         textColor = Colors.red[800]!;
         break;
@@ -284,7 +285,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
-  // ========== SECTION 2: ROUTE STOPS ==========
+  // các điểm dừng lộ trình
   Widget _buildRouteStopsSection() {
     final stops = _order!.shipment!.routeStops;
 
@@ -336,10 +337,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Row 1: STT + Warehouse Name + Status
+            // hàng 1: stt + tên kho + trạng thái
             Row(
               children: [
-                // STT Badge
+                // số thứ tự
                 Container(
                   width: 32,
                   height: 32,
@@ -358,7 +359,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 ),
                 const SizedBox(width: 12),
 
-                // Warehouse Name
+                // tên kho
                 Expanded(
                   child: Text(
                     stop.displayName,
@@ -371,7 +372,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   ),
                 ),
 
-                // Status Text
+                // trạng thái
                 Text(
                   stop.statusText,
                   style: TextStyle(
@@ -382,7 +383,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               ],
             ),
 
-            // Row 2: Timestamps (Stacked to avoid overflow)
+            // hàng 2: thời gian (xếp chồng để tránh tràn)
             if (stop.arrivedAt != null || stop.departedAt != null) ...[
               const SizedBox(height: 8),
               if (stop.arrivedAt != null)
@@ -422,17 +423,17 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Color _getStopStatusColor(int status) {
     switch (status) {
       case 0:
-        return Colors.grey; // Waiting
+        return Colors.grey; // đang chờ
       case 1:
-        return Colors.blue; // Arrived
+        return Colors.blue; // đã đến
       case 2:
-        return Colors.green; // Departed
+        return Colors.green; // đã rời đi
       default:
         return Colors.grey;
     }
   }
 
-  // ========== SECTION 3: SHIPPING INFO ==========
+  // thông tin vận chuyển
   Widget _buildShippingInfoSection() {
     final order = _order!;
 
@@ -450,18 +451,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Origin
+            // điểm đi - luôn hiển thị kho gửi
             _buildInfoRow(
               icon: Icons.location_on,
               iconColor: Colors.green,
               label: 'Điểm đi',
-              value: order.needPickup
-                  ? (order.pickupAddress ?? 'Địa chỉ lấy hàng')
-                  : (order.originWarehouse?.name ?? 'Kho gửi'),
+              value: order.originWarehouse?.name ?? 'Kho gửi',
             ),
             const SizedBox(height: 12),
 
-            // Destination
+            // điểm đến
             _buildInfoRow(
               icon: Icons.flag,
               iconColor: Colors.red,
@@ -469,7 +468,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               value: order.destWarehouse?.name ?? 'Kho nhận',
             ),
 
-            // Package description
+            // mô tả hàng hóa
             if (order.packageDescription != null &&
                 order.packageDescription!.isNotEmpty) ...[
               const SizedBox(height: 12),
@@ -483,7 +482,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
             const Divider(height: 24),
 
-            // Fee breakdown
+            // chi tiết phí
             _buildFeeRow('Phí vận chuyển', order.routeFee),
             if (order.pickupFee > 0)
               _buildFeeRow('Phí lấy hàng', order.pickupFee),

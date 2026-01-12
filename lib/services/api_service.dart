@@ -30,6 +30,120 @@ class ApiService {
     }
   }
 
+  /// Đăng ký tài khoản khách hàng mới
+  /// Trả về Map với 'success' (bool) và 'message' (String)
+  Future<Map<String, dynamic>> registerCustomer({
+    required String fullName,
+    required String username,
+    required String password,
+    required String address,
+    required String phone,
+    required String email,
+    String? avatarBase64,
+  }) async {
+    final url = Uri.parse('$baseUrl/auth/register/customer');
+
+    try {
+      final body = {
+        'FullName': fullName,
+        'Username': username,
+        'Password': password,
+        'Address': address,
+        'Phone': phone,
+        'Email': email,
+      };
+      if (avatarBase64 != null) {
+        body['AvatarBase64'] = avatarBase64;
+      }
+
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': 'Đăng ký thành công!'};
+      } else {
+        // Xử lý thông báo lỗi từ API
+        try {
+          final errorData = jsonDecode(response.body);
+          final errorMessage =
+              errorData['Message'] ??
+              errorData['message'] ??
+              'Đăng ký thất bại';
+          return {'success': false, 'message': errorMessage};
+        } catch (_) {
+          return {
+            'success': false,
+            'message': response.body.isNotEmpty
+                ? response.body
+                : 'Đăng ký thất bại',
+          };
+        }
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Lỗi kết nối: $e'};
+    }
+  }
+
+  /// Đăng ký tài khoản tài xế mới
+  /// Trả về Map với 'success' (bool) và 'message' (String)
+  Future<Map<String, dynamic>> registerDriver({
+    required String fullName,
+    required String username,
+    required String password,
+    required String phone,
+    required String licenseType,
+    required String citizenId,
+    String? avatarBase64,
+  }) async {
+    final url = Uri.parse('$baseUrl/auth/register/driver');
+
+    try {
+      final body = {
+        'FullName': fullName,
+        'Username': username,
+        'Password': password,
+        'Phone': phone,
+        'LicenseType': licenseType,
+        'CitizenId': citizenId,
+      };
+      if (avatarBase64 != null) {
+        body['AvatarBase64'] = avatarBase64;
+      }
+
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': 'Đăng ký thành công!'};
+      } else {
+        // Xử lý thông báo lỗi từ API
+        try {
+          final errorData = jsonDecode(response.body);
+          final errorMessage =
+              errorData['Message'] ??
+              errorData['message'] ??
+              'Đăng ký thất bại';
+          return {'success': false, 'message': errorMessage};
+        } catch (_) {
+          return {
+            'success': false,
+            'message': response.body.isNotEmpty
+                ? response.body
+                : 'Đăng ký thất bại',
+          };
+        }
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Lỗi kết nối: $e'};
+    }
+  }
+
   /// Cập nhật thông tin khách hàng
   Future<bool> updateCustomerProfile({
     required int customerId,
@@ -213,21 +327,21 @@ class ApiService {
     final url = Uri.parse('$baseUrl/order/history?customerId=$customerId');
 
     try {
-      print('🔍 Calling API: $url'); // DEBUG
+      print('Gọi API: $url'); // DEBUG
       final response = await http.get(url);
 
-      print('📡 Response status: ${response.statusCode}'); // DEBUG
-      print('📦 Response body: ${response.body}'); // DEBUG
+      print('Trạng thái phản hồi: ${response.statusCode}'); // DEBUG
+      print('Nội dung phản hồi: ${response.body}'); // DEBUG
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-        print('✅ Parsed ${data.length} orders'); // DEBUG
+        print('Đã parse ${data.length} đơn hàng'); // DEBUG
         return data.cast<Map<String, dynamic>>();
       }
-      print('❌ API returned status: ${response.statusCode}'); // DEBUG
+      print('API trả về status: ${response.statusCode}'); // DEBUG
       return [];
     } catch (e) {
-      print('💥 Error: $e'); // DEBUG
+      print('Lỗi: $e'); // DEBUG
       return [];
     }
   }
@@ -247,7 +361,7 @@ class ApiService {
       }
       return [];
     } catch (e) {
-      print('Error fetching warehouses: $e');
+      print('Lỗi khi lấy danh sách kho: $e');
       return [];
     }
   }
@@ -266,7 +380,7 @@ class ApiService {
       }
       return [];
     } catch (e) {
-      print('Error fetching warehouses by zone: $e');
+      print('Lỗi khi lấy kho theo vùng: $e');
       return [];
     }
   }
@@ -284,7 +398,7 @@ class ApiService {
       }
       return [];
     } catch (e) {
-      print('Error fetching zones: $e');
+      print('Lỗi khi lấy danh sách vùng: $e');
       return [];
     }
   }
@@ -347,20 +461,20 @@ class ApiService {
     );
 
     try {
-      print('🔍 Calling Tracking API: $url'); // DEBUG
+      print('Gọi API Tracking: $url'); // DEBUG
       final response = await http.get(url);
 
-      print('📡 Response status: ${response.statusCode}'); // DEBUG
+      print('Trạng thái phản hồi: ${response.statusCode}'); // DEBUG
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print('✅ Tracking data received'); // DEBUG
+        print('Đã nhận dữ liệu tracking'); // DEBUG
         return data;
       }
-      print('❌ Tracking API returned status: ${response.statusCode}'); // DEBUG
+      print('Tracking API trả về status: ${response.statusCode}'); // DEBUG
       return null;
     } catch (e) {
-      print('💥 Tracking Error: $e'); // DEBUG
+      print('Lỗi Tracking: $e'); // DEBUG
       return null;
     }
   }
@@ -376,7 +490,7 @@ class ApiService {
       }
       return null;
     } catch (e) {
-      print('Error getting dashboard stats: $e');
+      print('Lỗi khi lấy thống kê dashboard: $e');
       return null;
     }
   }
@@ -391,7 +505,7 @@ class ApiService {
       }
       return [];
     } catch (e) {
-      print('Error getting shipments: $e');
+      print('Lỗi khi lấy danh sách chuyến: $e');
       return [];
     }
   }
@@ -406,7 +520,7 @@ class ApiService {
       }
       return [];
     } catch (e) {
-      print('Error getting history: $e');
+      print('Lỗi khi lấy lịch sử: $e');
       return [];
     }
   }
@@ -425,7 +539,7 @@ class ApiService {
       }
       return null;
     } catch (e) {
-      print('Error getting shipment detail: $e');
+      print('Lỗi khi lấy chi tiết chuyến: $e');
       return null;
     }
   }
@@ -453,7 +567,7 @@ class ApiService {
 
       return response.statusCode == 200;
     } catch (e) {
-      print('Error updating status: $e');
+      print('Lỗi khi cập nhật trạng thái: $e');
       return false;
     }
   }

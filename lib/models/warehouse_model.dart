@@ -1,5 +1,5 @@
-/// Warehouse model for the Flutter app
-/// Matches the backend Warehouse entity and Zone enum
+// Warehouse model for the Flutter app
+// Matches the backend Warehouse entity and Zone enum
 
 /// Zone enum: North=0, Central=1, South=2
 enum ZoneId {

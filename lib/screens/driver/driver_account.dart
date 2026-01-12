@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
-import '../services/api_service.dart';
-import 'login_screen.dart';
+import '../../providers/auth_provider.dart';
+import '../../services/api_service.dart';
+import '../auth/login_screen.dart';
 
 class DriverAccountScreen extends StatefulWidget {
   const DriverAccountScreen({super.key});
@@ -20,21 +20,21 @@ class _DriverAccountScreenState extends State<DriverAccountScreen>
   @override
   bool get wantKeepAlive => true;
 
-  // Chế độ sửa
+  // chế độ sửa
   bool _isEditingProfile = false;
   bool _isEditingPassword = false;
   bool _isLoading = false;
 
-  // Controllers cho thông tin cá nhân
+  // controllers cho thông tin cá nhân
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _cccdController = TextEditingController();
 
-  // License type - dropdown
+  // loại bằng lái - dropdown
   String? _selectedLicenseType;
   final List<String> _licenseTypes = ['B2', 'C', 'D', 'E', 'FC', 'FD', 'FE'];
 
-  // Controllers cho mật khẩu
+  // controllers cho mật khẩu
   final _oldPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -122,7 +122,7 @@ class _DriverAccountScreenState extends State<DriverAccountScreen>
   }
 
   void _startEditingProfile(dynamic user) {
-    if (_isEditingPassword) return; // Prevent concurrent editing
+    if (_isEditingPassword) return; // ngăn chặn sửa đồng thời
     setState(() {
       _isEditingProfile = true;
       _nameController.text = user?.fullName ?? "";
@@ -133,7 +133,7 @@ class _DriverAccountScreenState extends State<DriverAccountScreen>
   }
 
   void _startEditingPassword() {
-    if (_isEditingProfile) return; // Prevent concurrent editing
+    if (_isEditingProfile) return; // ngăn chặn sửa đồng thời
     setState(() {
       _isEditingPassword = true;
       _oldPasswordController.clear();
@@ -385,7 +385,9 @@ class _DriverAccountScreenState extends State<DriverAccountScreen>
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 0, 157, 255),
+            ),
             child: const Text(
               "Đăng xuất",
               style: TextStyle(color: Colors.white),
@@ -406,7 +408,7 @@ class _DriverAccountScreenState extends State<DriverAccountScreen>
   }
 }
 
-// ===== AVATAR SECTION WIDGET =====
+// widget phần avatar
 class _AvatarSection extends StatelessWidget {
   final dynamic user;
   final bool isEditing;
@@ -424,10 +426,16 @@ class _AvatarSection extends StatelessWidget {
 
     if (user?.avatarBase64 != null && user.avatarBase64.isNotEmpty) {
       try {
-        avatarWidget = CircleAvatar(
-          radius: 50,
-          backgroundImage: MemoryImage(base64Decode(user.avatarBase64)),
-          backgroundColor: Colors.grey[300],
+        avatarWidget = Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.blue, width: 1),
+          ),
+          child: CircleAvatar(
+            radius: 50,
+            backgroundImage: MemoryImage(base64Decode(user.avatarBase64)),
+            backgroundColor: Colors.grey[300],
+          ),
         );
       } catch (e) {
         avatarWidget = _defaultAvatar();
@@ -478,15 +486,21 @@ class _AvatarSection extends StatelessWidget {
   }
 
   Widget _defaultAvatar() {
-    return const CircleAvatar(
-      radius: 50,
-      backgroundColor: Colors.blue,
-      child: Icon(Icons.drive_eta, size: 50, color: Colors.white),
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.blue, width: 1),
+      ),
+      child: const CircleAvatar(
+        radius: 50,
+        backgroundColor: Colors.blue,
+        child: Icon(Icons.drive_eta, size: 50, color: Colors.white),
+      ),
     );
   }
 }
 
-// ===== PROFILE CARD WIDGET =====
+// widget thẻ thông tin cá nhân
 class _ProfileCard extends StatelessWidget {
   final dynamic user;
   final bool isEditing;
@@ -648,7 +662,7 @@ class _ProfileCard extends StatelessWidget {
   }
 }
 
-// ===== PASSWORD CARD WIDGET =====
+// widget thẻ mật khẩu
 class _PasswordCard extends StatelessWidget {
   final dynamic user;
   final bool isEditing;
@@ -800,7 +814,7 @@ class _PasswordCard extends StatelessWidget {
   }
 }
 
-// ===== HELPER WIDGETS =====
+// các widget hỗ trợ
 class _InfoRow extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -1036,7 +1050,7 @@ class _LogoutButton extends StatelessWidget {
         icon: const Icon(Icons.logout),
         label: const Text("Đăng Xuất"),
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blueGrey,
+          backgroundColor: const Color.fromARGB(255, 0, 157, 255),
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 14),
           shape: RoundedRectangleBorder(

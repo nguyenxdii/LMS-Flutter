@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lms_flutter/screens/customer_account.dart';
-import 'package:lms_flutter/screens/customer_orders.dart';
+import 'package:lms_flutter/screens/customer/customer_account.dart';
+import 'package:lms_flutter/screens/customer/customer_orders.dart';
 
 class CustomerHomeScreen extends StatefulWidget {
   const CustomerHomeScreen({super.key});
@@ -12,7 +12,7 @@ class CustomerHomeScreen extends StatefulWidget {
 class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   int _selectedIndex = 0;
 
-  // List các trang
+  // list các trang
   final List<Widget> _pages = [
     const CustomerOrdersScreen(key: ValueKey('orders')),
     const CustomerAccountScreen(key: ValueKey('account')),
@@ -28,6 +28,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 242, 249, 255),
       appBar: AppBar(
         title: Text(_selectedIndex == 0 ? "Đơn Hàng" : "Tài Khoản"),
         centerTitle: true,

@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
-import '../services/api_service.dart';
-import 'login_screen.dart';
+import '../../providers/auth_provider.dart';
+import '../../services/api_service.dart';
+import '../auth/login_screen.dart';
 
 class CustomerAccountScreen extends StatefulWidget {
   const CustomerAccountScreen({super.key});
@@ -368,7 +368,9 @@ class _CustomerAccountScreenState extends State<CustomerAccountScreen>
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 0, 157, 255),
+            ),
             child: const Text(
               "Đăng xuất",
               style: TextStyle(color: Colors.white),
@@ -407,10 +409,16 @@ class _AvatarSection extends StatelessWidget {
 
     if (user?.avatarBase64 != null && user.avatarBase64.isNotEmpty) {
       try {
-        avatarWidget = CircleAvatar(
-          radius: 50,
-          backgroundImage: MemoryImage(base64Decode(user.avatarBase64)),
-          backgroundColor: Colors.grey[300],
+        avatarWidget = Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.blue, width: 1),
+          ),
+          child: CircleAvatar(
+            radius: 50,
+            backgroundImage: MemoryImage(base64Decode(user.avatarBase64)),
+            backgroundColor: Colors.grey[300],
+          ),
         );
       } catch (e) {
         avatarWidget = _defaultAvatar();
@@ -461,10 +469,16 @@ class _AvatarSection extends StatelessWidget {
   }
 
   Widget _defaultAvatar() {
-    return const CircleAvatar(
-      radius: 50,
-      backgroundColor: Colors.blue,
-      child: Icon(Icons.person, size: 50, color: Colors.white),
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.blue, width: 1),
+      ),
+      child: const CircleAvatar(
+        radius: 50,
+        backgroundColor: Colors.blue,
+        child: Icon(Icons.person, size: 50, color: Colors.white),
+      ),
     );
   }
 }
@@ -914,7 +928,7 @@ class _LogoutButton extends StatelessWidget {
         icon: const Icon(Icons.logout),
         label: const Text("Đăng Xuất"),
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blueGrey,
+          backgroundColor: const Color.fromARGB(255, 0, 157, 255),
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 14),
           shape: RoundedRectangleBorder(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lms_flutter/providers/auth_provider.dart';
-import 'package:lms_flutter/screens/customer_home.dart';
-import 'package:lms_flutter/screens/driver_home.dart';
+import 'package:lms_flutter/screens/customer/customer_home.dart';
+import 'package:lms_flutter/screens/driver/driver_home.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
-    // Ẩn bàn phím
+    // Ẩn bàn phím khi nhấn login
     FocusScope.of(context).unfocus();
 
     // Validate form
@@ -40,6 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
     // Gọi API đăng nhập
     final isSuccess = await authProvider.login(username, password);
 
+    // check widget xem widget còn tồn tại hay không
     if (!mounted) return;
 
     if (isSuccess) {
@@ -64,6 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // hiện thông báo snackbar
   void _showMessage(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(
@@ -79,45 +81,54 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final isLoading = Provider.of<AuthProvider>(context).isLoading;
 
+    // Ẩn bàn phím khi nhấn vào ngoài form
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        // backgroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 242, 249, 255),
+
+        // không bị che
         body: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+            // tạo padding cho tất cả widget trong singlechild
+            padding: const EdgeInsets.all(25.0),
             child: Form(
               key: _formKey,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 60),
+                  const SizedBox(height: 100),
 
                   const Text(
                     "LOGISTICS APP",
                     textAlign: TextAlign.center,
+
                     style: TextStyle(
-                      fontSize: 28,
+                      fontSize: 30,
                       fontWeight: FontWeight.bold,
                       color: Colors.blue,
-                      letterSpacing: 1.2,
+                      letterSpacing: 1.5,
                     ),
                   ),
-                  const SizedBox(height: 48),
 
-                  // Username field
+                  const SizedBox(height: 100),
+
+                  // Username Field
                   TextFormField(
                     controller: _usernameController,
                     decoration: InputDecoration(
                       labelText: "Tên đăng nhập",
-                      prefixIcon: const Icon(Icons.person, color: Colors.blue),
+                      prefixIcon: const Icon(
+                        Icons.person_2_outlined,
+                        color: Colors.blue,
+                      ),
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
+                      // Viền khi chưa focus nhập
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
@@ -125,7 +136,24 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: 1,
                         ),
                       ),
+                      // viền khi focus nhập
                       focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Colors.blue,
+                          width: 2,
+                        ),
+                      ),
+                      // viền khi có lỗi validation - giữ màu xanh
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Colors.blue.shade100,
+                          width: 1,
+                        ),
+                      ),
+                      // viền khi focus và có lỗi - giữ màu xanh
+                      focusedErrorBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(
                           color: Colors.blue,
@@ -141,6 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     textInputAction: TextInputAction.next,
                   ),
+
                   const SizedBox(height: 20),
 
                   // Password field
@@ -149,12 +178,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     obscureText: !_showPassword,
                     decoration: InputDecoration(
                       labelText: "Mật khẩu",
-                      prefixIcon: const Icon(Icons.lock, color: Colors.blue),
+                      prefixIcon: const Icon(
+                        Icons.lock_outline,
+                        color: Colors.blue,
+                      ),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _showPassword
-                              ? Icons.visibility
-                              : Icons.visibility_off,
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
                           color: Colors.blue,
                         ),
                         onPressed: () {
@@ -169,6 +201,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
+                      // viền khi chưa focus nhập
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
@@ -176,7 +209,24 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: 1,
                         ),
                       ),
+                      // viền khi focus nhập
                       focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Colors.blue,
+                          width: 2,
+                        ),
+                      ),
+                      // viền khi có lỗi validation - giữ màu xanh
+                      errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: Colors.blue.shade100,
+                          width: 1,
+                        ),
+                      ),
+                      // viền khi focus và có lỗi - giữ màu xanh
+                      focusedErrorBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(
                           color: Colors.blue,
@@ -192,7 +242,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     onFieldSubmitted: (_) => _handleLogin(),
                   ),
-                  const SizedBox(height: 40),
+
+                  const SizedBox(height: 30),
 
                   // Login button
                   isLoading
@@ -202,8 +253,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blue,
                             foregroundColor: Colors.white,
-                            elevation: 2,
-                            minimumSize: const Size(double.infinity, 56),
+                            elevation: 5,
+                            minimumSize: const Size(double.infinity, 55),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
@@ -213,10 +264,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
+                              letterSpacing: 5,
                             ),
                           ),
                         ),
-                  const SizedBox(height: 24),
+
+                  const SizedBox(height: 25),
 
                   // Register link
                   Column(
@@ -229,7 +282,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       TextButton(
                         onPressed: _goRegister,
                         child: const Text(
-                          "Đăng ký ngay",
+                          "Đăng ký ngay!",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.blue,

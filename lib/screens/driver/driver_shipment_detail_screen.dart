@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import '../models/driver_shipment_model.dart';
-import '../providers/auth_provider.dart';
-import '../services/api_service.dart';
+import '../../models/driver_shipment_model.dart';
+import '../../providers/auth_provider.dart';
+import '../../services/api_service.dart';
 
 class DriverShipmentDetailScreen extends StatefulWidget {
   final int shipmentId;
@@ -73,7 +73,7 @@ class _DriverShipmentDetailScreenState
     ).user?.driverId;
     if (driverId == null) return;
 
-    // Show loading
+    // hiển loading
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -88,7 +88,7 @@ class _DriverShipmentDetailScreenState
     );
 
     if (!mounted) return;
-    Navigator.pop(context); // Hide loading
+    Navigator.pop(context); // ẩn loading
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -97,7 +97,7 @@ class _DriverShipmentDetailScreenState
           backgroundColor: Colors.green,
         ),
       );
-      _loadDetail(); // Reload UI
+      _loadDetail(); // tải lại UI
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -144,6 +144,7 @@ class _DriverShipmentDetailScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 242, 249, 255),
       appBar: AppBar(
         title: Text(_detail?.header.shipmentNo ?? 'Chi tiết chuyến'),
         centerTitle: true,
@@ -171,7 +172,7 @@ class _DriverShipmentDetailScreenState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHeaderButtons(), // Note button only
+                    _buildHeaderButtons(), // nút ghi chú
                     const SizedBox(height: 16),
                     _buildHeaderCard(),
                     const SizedBox(height: 24),
@@ -185,7 +186,7 @@ class _DriverShipmentDetailScreenState
                     const SizedBox(height: 16),
                     _buildTimeline(),
                     const SizedBox(height: 24),
-                    _buildMainActionButtons(), // Main workflow buttons
+                    _buildMainActionButtons(), // nút thao tác chính
                   ],
                 ),
               ),
@@ -194,7 +195,7 @@ class _DriverShipmentDetailScreenState
   }
 
   Widget _buildHeaderButtons() {
-    // Note button: Only if OnRoute (moving)
+    // nút ghi chú: chỉ khi đang vận chuyển (OnRoute)
     bool canNote = _detail?.header.status == 'OnRoute';
 
     if (!canNote) return const SizedBox.shrink();
@@ -226,7 +227,7 @@ class _DriverShipmentDetailScreenState
             const Divider(),
             _buildInfoRow(Icons.person, 'Khách hàng', h.customerName),
             const Divider(),
-            // Special layout for Route
+            // bố cục đặc biệt cho tuyến đường
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Row(
@@ -371,7 +372,7 @@ class _DriverShipmentDetailScreenState
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: isActive
-                          ? Colors.blue.withOpacity(0.3)
+                          ? Colors.blue.withValues(alpha: 0.3)
                           : Colors.transparent,
                       width: 4,
                     ),
@@ -443,7 +444,7 @@ class _DriverShipmentDetailScreenState
     final stops = _detail!.stops;
     final currentSeq = _detail!.header.currentStopSeq;
 
-    // Find name of current/next stop for clearer buttons
+    // tìm tên điểm dừng hiện tại/tiếp theo cho nút rõ ràng hơn
     String currentStopName = "";
     String nextStopName = "";
 
@@ -464,7 +465,7 @@ class _DriverShipmentDetailScreenState
       }
     }
 
-    // 1. Pending -> Button "NHẬN CHUYẾN"
+    // 1. Pending -> nút "NHẬN CHUYẾN"
     if (status == 'Pending') {
       return SizedBox(
         width: double.infinity,
@@ -480,7 +481,7 @@ class _DriverShipmentDetailScreenState
       );
     }
 
-    // 2. Assigned -> "RỜI KHO [Start]"
+    // 2. Assigned -> "RỜI KHO [BẮt đầu]"
     if (status == 'Assigned') {
       return SizedBox(
         width: double.infinity,
@@ -496,7 +497,7 @@ class _DriverShipmentDetailScreenState
       );
     }
 
-    // 3. OnRoute -> "ĐẾN KHO [Next]"
+    // 3. OnRoute -> "ĐẾN KHO [Tiếp theo]"
     if (status == 'OnRoute') {
       return SizedBox(
         width: double.infinity,
@@ -512,7 +513,7 @@ class _DriverShipmentDetailScreenState
       );
     }
 
-    // 4. AtWarehouse -> "RỜI KHO [Current]"
+    // 4. AtWarehouse -> "RỜI KHO [Hiện tại]"
     if (status == 'AtWarehouse') {
       return SizedBox(
         width: double.infinity,
@@ -550,9 +551,9 @@ class _DriverShipmentDetailScreenState
         padding: const EdgeInsets.all(12),
         margin: const EdgeInsets.only(top: 8),
         decoration: BoxDecoration(
-          color: Colors.green[50], // Soft green background
+          color: Colors.green[50], // nền xanh nhạt
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.green.withOpacity(0.5)),
+          border: Border.all(color: Colors.green.withValues(alpha: 0.5)),
         ),
         child: const Center(
           child: Text(
