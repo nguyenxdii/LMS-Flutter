@@ -77,6 +77,41 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.of(context).pushNamed('/register');
   }
 
+  // Helper method tạo InputDecoration cho TextField
+  InputDecoration _buildInputDecoration({
+    required String labelText,
+    required IconData prefixIcon,
+    Widget? suffixIcon,
+  }) {
+    return InputDecoration(
+      labelText: labelText,
+      prefixIcon: Icon(prefixIcon, color: Colors.blue),
+      suffixIcon: suffixIcon,
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.blue.shade100, width: 1),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.blue, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.blue.shade100, width: 1),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.blue, width: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isLoading = Provider.of<AuthProvider>(context).isLoading;
@@ -91,7 +126,6 @@ class _LoginScreenState extends State<LoginScreen> {
         // không bị che
         body: SafeArea(
           child: SingleChildScrollView(
-            // tạo padding cho tất cả widget trong singlechild
             padding: const EdgeInsets.all(25.0),
             child: Form(
               key: _formKey,
@@ -100,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 100),
 
                   const Text(
-                    "LOGISTICS APP",
+                    "LMS",
                     textAlign: TextAlign.center,
 
                     style: TextStyle(
@@ -116,50 +150,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Username Field
                   TextFormField(
                     controller: _usernameController,
-                    decoration: InputDecoration(
+                    decoration: _buildInputDecoration(
                       labelText: "Tên đăng nhập",
-                      prefixIcon: const Icon(
-                        Icons.person_2_outlined,
-                        color: Colors.blue,
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      // Viền khi chưa focus nhập
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: Colors.blue.shade100,
-                          width: 1,
-                        ),
-                      ),
-                      // viền khi focus nhập
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: Colors.blue,
-                          width: 2,
-                        ),
-                      ),
-                      // viền khi có lỗi validation - giữ màu xanh
-                      errorBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: Colors.blue.shade100,
-                          width: 1,
-                        ),
-                      ),
-                      // viền khi focus và có lỗi - giữ màu xanh
-                      focusedErrorBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: Colors.blue,
-                          width: 2,
-                        ),
-                      ),
+                      prefixIcon: Icons.person_2_outlined,
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -176,12 +169,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextFormField(
                     controller: _passwordController,
                     obscureText: !_showPassword,
-                    decoration: InputDecoration(
+                    decoration: _buildInputDecoration(
                       labelText: "Mật khẩu",
-                      prefixIcon: const Icon(
-                        Icons.lock_outline,
-                        color: Colors.blue,
-                      ),
+                      prefixIcon: Icons.lock_outline,
                       suffixIcon: IconButton(
                         icon: Icon(
                           _showPassword
@@ -194,44 +184,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             _showPassword = !_showPassword;
                           });
                         },
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      // viền khi chưa focus nhập
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: Colors.blue.shade100,
-                          width: 1,
-                        ),
-                      ),
-                      // viền khi focus nhập
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: Colors.blue,
-                          width: 2,
-                        ),
-                      ),
-                      // viền khi có lỗi validation - giữ màu xanh
-                      errorBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: Colors.blue.shade100,
-                          width: 1,
-                        ),
-                      ),
-                      // viền khi focus và có lỗi - giữ màu xanh
-                      focusedErrorBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: Colors.blue,
-                          width: 2,
-                        ),
                       ),
                     ),
                     validator: (value) {
